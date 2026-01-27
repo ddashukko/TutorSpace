@@ -36,6 +36,12 @@ const LESSONS = [
     class: "8",
     maxScore: 12,
   },
-
+  {
+    id: "math_7_intensive_calc",
+    title: "Інтенсив: Множення та Ділення (Стовпчик)",
+    file: "lessons/multiplication-division.html",
+    class: "7",
+    maxScore: 12,
+  },
   // Сюди додаєш нові уроки через кому
 ];
