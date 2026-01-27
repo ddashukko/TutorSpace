@@ -36,6 +36,13 @@ const LESSONS = [
     class: "8",
     maxScore: 12,
   },
+  {
+    id: "alg8_17_properties",
+    title: "Алгебра 9. Хз шо ета за урок",
+    file: "lessons/lesson-Nastya.html",
+    class: "9",
+    maxScore: 12,
+  },
 
   // Сюди додаєш нові уроки через кому
 ];
