@@ -43,5 +43,12 @@ const LESSONS = [
     class: "7",
     maxScore: 12,
   },
+  {
+    id: "alg10_pidhotovka_nmt",
+    title: "Підготовка до нмт. Рівняння",
+    file: "lessons/Yara.html",
+    class: "10",
+    maxScore: 12,
+  },
   // Сюди додаєш нові уроки через кому
 ];
