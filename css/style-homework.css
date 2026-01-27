@@ -1,25 +1,25 @@
 :root {
-  /* СИНЯ ТЕМА */
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --primary-light: #eef2ff;
-  --primary-soft: rgba(79, 70, 229, 0.1);
+  /* ФІОЛЕТОВА ТЕМА ДЛЯ ДОМАШКИ */
+  --primary: #7c3aed; /* Violet */
+  --primary-hover: #6d28d9;
+  --primary-light: #f5f3ff;
+  --primary-soft: rgba(124, 58, 237, 0.1);
 
   --success: #10b981;
   --error: #ef4444;
 
   --text-main: #1e293b;
   --text-muted: #64748b;
-  --bg-app: #f8fafc;
+  --bg-app: #fafafa;
   --surface: #ffffff;
-  --border: #e2e8f0;
+  --border: #e5e7eb;
 
   --radius-lg: 16px;
   --radius-md: 10px;
   --radius-sm: 6px;
 }
 
-/* Статистика (тільки в уроках і домашці видно) */
+/* Статистика */
 .stats-container {
   display: flex;
   gap: 16px;
@@ -31,7 +31,7 @@
   font-weight: 700;
 }
 
-/* Візуалізація відповідей (відразу) */
+/* Візуалізація відповідей */
 input.correct {
   color: var(--success);
   font-weight: bold;
@@ -52,16 +52,7 @@ input.wrong {
   border-color: var(--error);
 }
 
-/* Стилі кнопок навігації */
-.btn-lesson-link.homework {
-  background: white;
-  color: var(--primary);
-  border-color: var(--primary-light);
-  flex: 1;
-}
-.btn-lesson-link.test {
-  background: #fff7ed;
-  color: #c2410c;
-  border-color: #fed7aa;
-  flex: 1;
-}
+/* Кнопки навігації */
+.btn-lesson-link {
+  display: none;
+} /* В домашці зазвичай немає переходу далі, але можна лишити */

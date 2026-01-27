@@ -3,19 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Завантаження...</title>
-    Для Уроку:
-    <link rel="stylesheet" href="../css/style-core.css" />
-    <link rel="stylesheet" href="../css/style-lesson.css" />
-
-    Для Домашки:
-    <link rel="stylesheet" href="../css/style-core.css" />
-    <link rel="stylesheet" href="../css/style-homework.css" />
-
-    Для Тесту:
+    <title>Тестування: Множення та Ділення</title>
     <link rel="stylesheet" href="../css/style-core.css" />
     <link rel="stylesheet" href="../css/style-test.css" />
-
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
@@ -25,18 +15,15 @@
     <div id="tasks-section">
       <header>
         <a href="../index.html" class="btn-home">← Назад</a>
-
         <div
           id="lesson-title-display"
           style="font-weight: 700; font-size: 1.1rem; text-align: center"
         >
-          Завантаження уроку...
+          Завантаження тесту...
         </div>
-
         <div class="stats-container">
           ✅ <span id="val-correct">0</span> ❌ <span id="val-wrong">0</span>
         </div>
-
         <button
           id="toggle-board-btn"
           class="btn-icon"
@@ -63,7 +50,7 @@
       <div class="content-container">
         <div id="quiz-root"></div>
         <button class="btn-finish" onclick="finishLesson()">
-          Завершити урок
+          Завершити тест
         </button>
       </div>
     </div>
@@ -98,36 +85,25 @@
 
     <script>
       const LESSON_DATA = {
-        // 1. НАЗВА УРОКУ (Відобразиться зверху і у вкладці)
-        title: "Алгебра 8. Тема уроку (Шаблон)",
-
-        // 2. ВПРАВИ І ШПАРГАЛКА
+        title: "Контрольне Тестування",
         exercises: [
-          // --- ШПАРГАЛКА ---
           {
-            id: "info",
-            title: "📚 Шпаргалка",
-            desc: "Корисні формули до уроку",
-            visual: `
-                    <ul style="line-height: 1.8; margin: 0; padding-left: 20px;">
-                        <li>Формула 1: $a^2 + b^2 = c^2$</li>
-                        <li>Формула 2: $\\frac{a}{b}$</li>
-                    </ul>
-                `,
-            tasks: [],
-          },
-
-          // --- ВПРАВА 1 ---
-          {
-            id: "1",
-            title: "Завдання 1",
-            desc: "Опис завдання",
+            id: "test",
+            title: "🎓 Фінальна Перевірка",
+            desc: "Перевір свої знання по всім темам.",
             tasks: [
-              { id: "1)", q: "2 + 2 = ?", a: "4", type: "input" },
-              { id: "2)", q: "Земля кругла?", a: "Так", opts: ["Так", "Ні"] },
+              { id: "1)", q: "$50 \\times 20 = $", a: "1000", type: "input" },
+              { id: "2)", q: "$25 \\times 4 = $", a: "100", type: "input" },
+              { id: "3)", q: "$309 \\div 3 = $", a: "103", type: "input" },
+              { id: "4)", q: "$64 \\div 16 = $", a: "4", type: "input" },
+              { id: "5)", q: "$11 \\times 12 = $", a: "132", type: "input" },
+              { id: "6)", q: "$612 \\div 3 = $", a: "204", type: "input" },
+              { id: "7)", q: "$125 \\times 8 = $", a: "1000", type: "input" },
+              { id: "8)", q: "$240 \\div 12 = $", a: "20", type: "input" },
+              { id: "9)", q: "$15 \\times 15 = $", a: "225", type: "input" },
+              { id: "10)", q: "$505 \\div 5 = $", a: "101", type: "input" },
             ],
           },
-          // ... копіюй блоки {...} для нових вправ
         ],
       };
     </script>

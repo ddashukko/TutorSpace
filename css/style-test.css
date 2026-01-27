@@ -1,0 +1,73 @@
+:root {
+  /* ПОМАРАНЧЕВА ТЕМА (ТЕСТ) */
+  --primary: #ea580c; /* Orange */
+  --primary-hover: #c2410c;
+  --primary-light: #fff7ed;
+  --primary-soft: rgba(234, 88, 12, 0.1);
+
+  --success: #10b981;
+  --error: #ef4444;
+
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --bg-app: #fff7ed; /* Легкий помаранчевий фон */
+  --surface: #ffffff;
+  --border: #fed7aa;
+
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-sm: 6px;
+}
+
+/* Специфічний стиль карток для тесту */
+.exercise-block {
+  border-left: 4px solid var(--primary);
+}
+
+/* ХОВАЄМО статистику і кнопки перевірки */
+.stats-container {
+  display: none !important;
+}
+.btn-check {
+  display: none !important;
+}
+
+/* Валідація: Нейтральна до перевірки */
+input.correct,
+input.wrong {
+  color: var(--text-main);
+  font-weight: normal;
+  text-decoration: none;
+}
+.option-btn.selected-correct,
+.option-btn.selected-wrong,
+.option-btn.selected-neutral {
+  background: var(--text-main);
+  color: white;
+  border-color: var(--text-main);
+  opacity: 1;
+}
+
+/* Валідація: ПІСЛЯ ЗДАЧІ (JS додає клас .checked на body) */
+body.checked input.correct {
+  color: var(--success);
+  font-weight: bold;
+}
+body.checked input.wrong {
+  color: var(--error);
+  text-decoration: line-through;
+}
+
+body.checked .option-btn.selected-correct {
+  background: var(--success);
+  border-color: var(--success);
+}
+body.checked .option-btn.selected-wrong {
+  background: var(--error);
+  border-color: var(--error);
+}
+
+/* Кнопки навігації */
+.btn-lesson-link {
+  display: none;
+}
