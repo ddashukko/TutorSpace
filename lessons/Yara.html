@@ -1,379 +1,248 @@
-
 <!doctype html>
 <html lang="uk">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Алгебра 10: Рівняння та параметри</title>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Алгебра 10: Рівняння та параметри</title>
 
-    <link rel="stylesheet" href="../css/style-core.css" />
-    <link rel="stylesheet" href="../css/style-lesson.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
-    <style>
-      /* Локальні стилі для шаблону (щоб сторінка працювала автономно) */
-      body { margin: 0; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; overflow: hidden; background: #f4f7f9; }
-      #tasks-section { flex: 1; display: flex; flex-direction: column; background: white; border-right: 1px solid #ddd; overflow-y: auto; }
-      header { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; border-bottom: 2px solid #eee; background: #fff; position: sticky; top: 0; z-index: 10; }
-      .content-container { padding: 20px; max-width: 900px; margin: 0 auto; }
-      .stats-container { font-weight: bold; font-size: 1.1rem; }
-      .exercise-block { margin-bottom: 30px; border: 1px solid #e1e8ed; border-radius: 12px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-      .theory-box { background: #f0f7ff; padding: 15px; border-radius: 8px; border-left: 5px solid #2563eb; margin-bottom: 20px; }
-      .task-item { margin: 15px 0; padding: 15px; border-bottom: 1px solid #f0f0f0; }
-      .input-group { display: flex; gap: 10px; margin-top: 10px; }
-      input { flex: 1; padding: 10px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 1rem; }
-      input.correct { border-color: #10b981; background: #ecfdf5; }
-      input.wrong { border-color: #ef4444; background: #fef2f2; }
-      button { cursor: pointer; border: none; border-radius: 8px; transition: 0.2s; font-weight: 600; }
-      .btn-finish { background: #1e293b; color: white; width: 100%; padding: 15px; font-size: 1.1rem; margin-top: 20px; }
-      #board-section { width: 45%; display: flex; flex-direction: column; background: #f8fafc; min-width: 360px; }
-      .tools { padding: 10px; background: #f1f5f9; border-bottom: 1px solid #ddd; display: flex; gap: 8px; }
-      #board { flex: 1; background: white; cursor: crosshair; touch-action: none; display: block; width: 100%; height: 100%; }
-      .btn-tool { padding: 8px 12px; background: white; border: 1px solid #cbd5e1; font-size: 1.2rem; }
-      .btn-tool.active { background: #2563eb; color: white; }
-      .hint-btn, .sol-btn { font-size: 0.8rem; color: #2563eb; background: none; text-decoration: underline; margin-right: 10px; }
-      .hidden-box { display: none; margin-top: 10px; padding: 10px; background: #fffbeb; border: 1px dashed #f59e0b; border-radius: 6px; }
-    </style>
-  </head>
-  <body>
-    <div id="tasks-section">
-      <header>
-        <a href="../index.html" class="btn-home">← Назад</a>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+  <style>
+    body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;display:flex;height:100vh;overflow:hidden;background:#f4f7f9}
+    #tasks-section{flex:1;display:flex;flex-direction:column;background:#fff;border-right:1px solid #e6eef6;overflow:auto}
+    header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid #eef2f7;background:#fff;position:sticky;top:0;z-index:20}
+    .content-container{padding:18px;max-width:980px;margin:0 auto}
+    .exercise-block{margin-bottom:18px;border:1px solid #e9f0f7;border-radius:10px;padding:14px;background:#fff}
+    .theory-box{background:#f0f7ff;padding:12px;border-radius:8px;border-left:4px solid #2563eb;margin-bottom:12px}
+    .task-item{padding:10px 0;border-top:1px dashed #f0f4f8}
+    .task-item:first-of-type{border-top:none}
+    .input-group{display:flex;gap:8px;margin-top:8px}
+    input[type="text"]{flex:1;padding:8px;border:1px solid #cbd5e1;border-radius:8px;font-size:1rem}
+    input.correct{border-color:#10b981;background:#ecfdf5}
+    input.wrong{border-color:#ef4444;background:#fff1f2}
+    .btn-check{background:#2563eb;color:#fff;padding:8px 12px;border-radius:8px;border:none;font-weight:600}
+    .sol-btn{background:none;border:none;color:#2563eb;text-decoration:underline;cursor:pointer;padding:6px}
+    .hidden-box{display:none;margin-top:8px;padding:10px;background:#fffbeb;border:1px dashed #f59e0b;border-radius:6px}
+    .btn-finish{background:#0f172a;color:#fff;padding:12px;border-radius:10px;border:none;width:100%;font-weight:700;margin-top:12px}
+    #board-section{width:42%;min-width:320px;display:flex;flex-direction:column;background:#f8fafc}
+    .tools{padding:10px;background:#f1f5f9;border-bottom:1px solid #e6eef6;display:flex;gap:8px}
+    #board{flex:1;background:#fff;display:block;width:100%;height:100%}
+    .btn-tool{padding:8px 10px;border-radius:8px;border:1px solid #cbd5e1;background:#fff;cursor:pointer}
+    .btn-tool.active{background:#2563eb;color:#fff}
+  </style>
+</head>
+<body>
 
-        <div id="lesson-title-display" style="font-weight: 700; font-size: 1.1rem; text-align: center">
-          Завантаження уроку...
-        </div>
+  <div id="tasks-section">
+    <header>
+      <a href="#" class="btn-home" style="color:#64748b;text-decoration:none">← Назад</a>
+      <div id="lesson-title-display" style="font-weight:700;font-size:1.05rem;text-align:center">Завантаження уроку...</div>
+      <div class="stats-container">✅ <span id="val-correct">0</span> ❌ <span id="val-wrong">0</span></div>
+      <button id="toggle-board-btn" class="btn-tool" onclick="toggleBoard()">Дошка</button>
+    </header>
 
-        <div class="stats-container">
-          ✅ <span id="val-correct">0</span> ❌ <span id="val-wrong">0</span>
-        </div>
-
-        <button id="toggle-board-btn" class="btn-icon" title="Сховати/Показати дошка" onclick="toggleBoard()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="3" y1="9" x2="21" y2="9"></line>
-            <line x1="9" y1="21" x2="9" y2="9"></line>
-          </svg>
-          <span>Дошка</span>
-        </button>
-      </header>
-
-      <div class="content-container">
-        <div id="quiz-root"></div>
-        <button class="btn-finish" onclick="finishLesson()">Завершити урок</button>
-      </div>
+    <div class="content-container">
+      <div id="quiz-root"></div>
+      <button class="btn-finish" onclick="finishLesson()">Завершити урок</button>
     </div>
+  </div>
 
-    <div id="board-section">
-      <div class="tools">
-        <button class="btn-tool active" onclick="setTool('pen')" id="t-pen">🖊️</button>
-        <button class="btn-tool" onclick="setTool('eraser')" id="t-eraser">🧹</button>
-        <button class="btn-tool" onclick="drawGrid()">🌐</button>
-        <button class="btn-tool" onclick="clearCanvas()" style="color: red">❌</button>
-      </div>
-      <canvas id="board"></canvas>
+  <div id="board-section">
+    <div class="tools">
+      <button class="btn-tool active" id="t-pen" onclick="setTool('pen')">🖊️</button>
+      <button class="btn-tool" id="t-eraser" onclick="setTool('eraser')">🧹</button>
+      <button class="btn-tool" onclick="drawGrid()">🌐</button>
+      <button class="btn-tool" onclick="clearCanvas()" style="color:red">❌</button>
     </div>
+    <canvas id="board"></canvas>
+  </div>
 
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
-    <!-- Локальні скрипти (можна замінити на ваші файли) -->
-    <script>
-      /* --- Дані уроку: вставлено всі 20 завдань згідно з вашим списком --- */
-      const LESSON_DATA = {
-        title: "Алгебра 10: Лінійні рівняння та параметри",
-        exercises: [
-          {
-            id: "section-1",
-            title: "Розділ 1: Логіка рівноваги (Базові рівняння)",
-            desc: "Прості рівняння виду x + b = c або a + x = b",
-            visual: `
-              <div class="theory-box">
-                <p><strong>Правило терезів:</strong> Що робимо з лівою частиною, те саме робимо з правою.</p>
-                <p>Приклад: \\(x + 14 = 30 \\Rightarrow x = 30 - 14\\).</p>
-              </div>
-            `,
-            tasks: [
-              { id: "1", q: "$x + 14 = 30$", a: "16", solution: "$x = 30 - 14$" },
-              { id: "2", q: "$x - 9 = -5$", a: "4", solution: "$x = -5 + 9$" },
-              { id: "3", q: "$25 - x = 10$", a: "15", solution: "$x = 25 - 10$" },
-              { id: "4", q: "$12 + x = 2$", a: "-10", solution: "$x = 2 - 12$" },
-              { id: "5", q: "$x - 1.5 = 2$", a: "3.5", solution: "$x = 2 + 1.5$" }
-            ]
-          },
+  <script>
+    /* ---------- Дані уроку (всі 20 завдань) ---------- */
+    const LESSON_DATA = {
+      title: "Алгебра 10: Лінійні рівняння та параметри",
+      exercises: [
+        {
+          id: "info",
+          title: "📚 Шпаргалка: Правила гри",
+          desc: "Фундамент для розв'язання рівнянь",
+          visual: `
+            <div class="theory-box">
+              <p><strong>1. Правило терезів:</strong> Що робимо з лівою частиною, те саме робимо з правою.</p>
+              <p><strong>2. Три обличчя \\(ax=b\\):</strong></p>
+              <ul style="margin:0;padding-left:18px">
+                <li>Якщо \\(a\\neq0\\) → \\(x=\\dfrac{b}{a}\\).</li>
+                <li>Якщо \\(a=0\\) і \\(b\\neq0\\) → немає розв'язків.</li>
+                <li>Якщо \\(a=0\\) і \\(b=0\\) → безліч розв'язків.</li>
+              </ul>
+              <p><strong>3. Дроби:</strong> \\(\\dfrac{A}{B}=0\\) якщо \\(A=0\\) та \\(B\\neq0\\).</p>
+            </div>
+          `,
+          tasks: []
+        },
+        {
+          id: "s1",
+          title: "Розділ 1: Логіка рівноваги (Базові рівняння)",
+          tasks: [
+            {id:"1", q:"$x + 14 = 30$", a:"16", solution:"$x = 30 - 14$"},
+            {id:"2", q:"$x - 9 = -5$", a:"4", solution:"$x = -5 + 9$"},
+            {id:"3", q:"$25 - x = 10$", a:"15", solution:"$x = 25 - 10$"},
+            {id:"4", q:"$12 + x = 2$", a:"-10", solution:"$x = 2 - 12$"},
+            {id:"5", q:"$x - 1.5 = 2$", a:"3.5", solution:"$x = 2 + 1.5$"}
+          ]
+        },
+        {
+          id: "s2",
+          title: "Розділ 2: Основна форма $ax = b$",
+          tasks: [
+            {id:"6", q:"$5x = 45$", a:"9", solution:"$x = 45 / 5$"},
+            {id:"7", q:"$-3x = 21$", a:"-7", solution:"$x = 21 / (-3)$"},
+            {id:"8", q:"$0.2x = 4$", a:"20", solution:"$x = 4 / 0.2 = 4 \\cdot 5$"},
+            {id:"9", q:"$0x = 10$", a:"немає", solution:"Немає розв'язків"},
+            {id:"10", q:"$0x = 0$", a:"безліч", solution:"Безліч розв'язків"}
+          ]
+        },
+        {
+          id: "s3",
+          title: "Розділ 3: Національні пастки (ОДЗ)",
+          tasks: [
+            {id:"11", q:"$\\dfrac{x-5}{x+2} = 0$", a:"5", solution:"Чисельник 0 → x=5; знаменник 5+2≠0"},
+            {id:"12", q:"$\\dfrac{2x+6}{x-1} = 0$", a:"-3", solution:"2x+6=0 → x=-3; знаменник ≠0"},
+            {id:"13", q:"$\\dfrac{x-4}{x-4} = 0$", a:"немає", solution:"x=4 заборонено (знаменник 0)"},
+            {id:"14", q:"$\\dfrac{x(x-2)}{x} = 0$", a:"2", solution:"x≠0; з чисельника x=0 або x=2 → лишається x=2"},
+            {id:"15", q:"$\\dfrac{x^2-9}{x-3} = 0$", a:"-3", solution:"корені 3 і -3; x=3 заборонено → x=-3"}
+          ]
+        },
+        {
+          id: "s4",
+          title: "Розділ 4: Вступ до параметрів",
+          tasks: [
+            {id:"16", q:"$ax = 5$ — при якому $a$ немає коренів?", a:"0", solution:"a=0 → 0x=5 немає розв'язків"},
+            {id:"17", q:"$(a-2)x = 0$ — при якому $a$ коренів безліч?", a:"2", solution:"a=2 → 0x=0 безліч"},
+            {id:"18", q:"$\\dfrac{x-3}{x-a} = 0$ — при якому $a$ немає коренів?", a:"3", solution:"a=3 → потенційний корінь x=3 заборонений"},
+            {id:"19", q:"$(a+5)x = 7$ — при якому $a$ немає коренів?", a:"-5", solution:"a=-5 → 0x=7 немає розв'язків"},
+            {id:"20", q:"$\\dfrac{x-a}{x-7} = 0$ — при якому $a$ немає коренів?", a:"7", solution:"a=7 → корінь x=7 робить знаменник 0"}
+          ]
+        }
+      ]
+    };
 
-          {
-            id: "section-2",
-            title: "Розділ 2: Основна форма $ax = b$",
-            desc: "Розв'язування рівнянь виду $ax=b$",
-            visual: `
-              <div class="theory-box">
-                <p><strong>Три випадки для \\(ax=b\\):</strong></p>
-                <ul style="list-style: none; padding-left: 10px;">
-                  <li>Якщо \\(a \\neq 0\\), то \\(x = \\dfrac{b}{a}\\).</li>
-                  <li>Якщо \\(a = 0\\) і \\(b \\neq 0\\), то розв'язків немає.</li>
-                  <li>Якщо \\(a = 0\\) і \\(b = 0\\), то розв'язків безліч.</li>
-                </ul>
-              </div>
-            `,
-            tasks: [
-              { id: "6", q: "$5x = 45$", a: "9", solution: "$x = 45 / 5$" },
-              { id: "7", q: "$-3x = 21$", a: "-7", solution: "$x = 21 / (-3)$" },
-              { id: "8", q: "$0.2x = 4$", a: "20", solution: "$x = 4 / 0.2 = 4 \\cdot 5$" },
-              { id: "9", q: "$0x = 10$", a: "немає", solution: "Немає розв'язків, бо 0 не може дорівнювати 10." },
-              { id: "10", q: "$0x = 0$", a: "безліч", solution: "Будь-яке число при множенні на 0 дає 0 — безліч розв'язків." }
-            ]
-          },
+    /* ---------- Рендер контенту ---------- */
+    function renderLessonData(){
+      const root = document.getElementById('quiz-root');
+      root.innerHTML = '';
+      document.title = LESSON_DATA.title;
+      document.getElementById('lesson-title-display').textContent = LESSON_DATA.title;
 
-          {
-            id: "section-3",
-            title: "Розділ 3: Національні пастки (ОДЗ)",
-            desc: "Рівняння з дробами — не забуваємо область допустимих значень (ОДЗ).",
-            visual: `
-              <div class="theory-box">
-                <p><strong>Правило для дробів:</strong> \\(\\dfrac{A}{B} = 0\\) тоді й тільки тоді, коли \\(A = 0\\) та \\(B \\neq 0\\).</p>
-              </div>
-            `,
-            tasks: [
-              { id: "11", q: "$\\dfrac{x-5}{x+2} = 0$", a: "5", solution: "Чисельник \\(x-5=0\\) дає \\(x=5\\); перевірка: знаменник \\(5+2\\neq0\\)." },
-              { id: "12", q: "$\\dfrac{2x+6}{x-1} = 0$", a: "-3", solution: "Розв'язок чисельника: \\(2x+6=0\\Rightarrow x=-3\\); знаменник \\(-3-1\\neq0\\)." },
-              { id: "13", q: "$\\dfrac{x-4}{x-4} = 0$", a: "немає", solution: "При \\(x=4\\) чисельник = 0, але й знаменник = 0 — заборонено." },
-              { id: "14", q: "$\\dfrac{x(x-2)}{x} = 0$", a: "2", solution: "Відкидаємо \\(x=0\\) (знаменник), чисельник дає \\(x=0\\) або \\(x=2\\) — лишається \\(x=2\\)." },
-              { id: "15", q: "$\\dfrac{x^2-9}{x-3} = 0$", a: "-3", solution: "Чисельник має корені \\(x=3\\) та \\(x=-3\\); але \\(x=3\\) заборонено (знаменник = 0), отже \\(x=-3\\)." }
-            ]
-          },
-
-          {
-            id: "section-4",
-            title: "Розділ 4: Вступ до параметрів",
-            desc: "Питання про значення параметра, при яких змінюється кількість розв'язків.",
-            visual: `
-              <div class="theory-box">
-                <p>Аналізуємо залежність розв'язків від параметра \\(a\\).</p>
-              </div>
-            `,
-            tasks: [
-              { id: "16", q: "$ax = 5$ — при якому $a$ немає коренів?", a: "0", solution: "Якщо \\(a=0\\), то рівняння стає \\(0x=5\\) — немає розв'язків." },
-              { id: "17", q: "$(a-2)x = 0$ — при якому $a$ коренів безліч?", a: "2", solution: "Якщо \\(a=2\\), то \\(0x=0\\) — безліч розв'язків." },
-              { id: "18", q: "$\\dfrac{x-3}{x-a} = 0$ — при якому $a$ немає коренів?", a: "3", solution: "Якщо \\(a=3\\), то потенційний корінь \\(x=3\\) робить знаменник нуль — заборонено." },
-              { id: "19", q: "$(a+5)x = 7$ — при якому $a$ немає коренів?", a: "-5", solution: "Якщо \\(a=-5\\), то \\(0x=7\\) — немає розв'язків." },
-              { id: "20", q: "$\\dfrac{x-a}{x-7} = 0$ — при якому $a$ немає коренів?", a: "7", solution: "Якщо \\(a=7\\), то чисельник нуль при \\(x=7\\), але це робить знаменник нуль — заборонено." }
-            ]
-          }
-        ]
-      };
-
-      /* --- Простий рендерер для відображення LESSON_DATA у #quiz-root --- */
-      function renderLessonData() {
-        const root = document.getElementById('quiz-root');
-        root.innerHTML = ''; // очистити
-        document.title = LESSON_DATA.title;
-        document.getElementById('lesson-title-display').textContent = LESSON_DATA.title;
-
-        LESSON_DATA.exercises.forEach(section => {
-          const sec = document.createElement('section');
-          sec.className = 'exercise-block';
-          const h = document.createElement('h3');
-          h.textContent = section.title;
-          sec.appendChild(h);
-
-          if (section.desc) {
-            const p = document.createElement('p');
-            p.textContent = section.desc;
-            sec.appendChild(p);
-          }
-
-          if (section.visual) {
-            const div = document.createElement('div');
-            div.innerHTML = section.visual;
-            sec.appendChild(div);
-          }
-
-          if (Array.isArray(section.tasks) && section.tasks.length) {
-            section.tasks.forEach(task => {
-              const t = document.createElement('div');
-              t.className = 'task-item';
-              const q = document.createElement('div');
-              q.innerHTML = `<strong>${task.id}.</strong> <span class="question">${task.q}</span>`;
-              t.appendChild(q);
-
-              const inputGroup = document.createElement('div');
-              inputGroup.className = 'input-group';
-
-              const input = document.createElement('input');
-              input.type = 'text';
-              input.placeholder = 'Введіть відповідь';
-              input.dataset.answer = String(task.a);
-              inputGroup.appendChild(input);
-
-              const checkBtn = document.createElement('button');
-              checkBtn.className = 'btn-check';
-              checkBtn.textContent = 'Перевірити';
-              checkBtn.onclick = () => {
-                const user = input.value.trim();
-                const correct = String(task.a).trim();
-                if (user === correct) {
-                  input.classList.remove('wrong');
-                  input.classList.add('correct');
-                  incrementStat('correct');
-                } else {
-                  input.classList.remove('correct');
-                  input.classList.add('wrong');
-                  incrementStat('wrong');
-                }
-              };
-              inputGroup.appendChild(checkBtn);
-
-              const showSol = document.createElement('button');
-              showSol.className = 'sol-btn';
-              showSol.textContent = 'Показати розв\'язання';
-              showSol.onclick = () => {
-                solBox.style.display = solBox.style.display === 'block' ? 'none' : 'block';
-              };
-              inputGroup.appendChild(showSol);
-
-              t.appendChild(inputGroup);
-
-              const solBox = document.createElement('div');
-              solBox.className = 'hidden-box';
-              solBox.innerHTML = `<strong>Відповідь:</strong> ${task.a} <br><strong>Розв'язання:</strong> ${task.solution || ''}`;
-              t.appendChild(solBox);
-
-              sec.appendChild(t);
-            });
-          }
-
-          root.appendChild(sec);
-        });
-
-        // Після вставки контенту — рендеримо формули KaTeX
-        renderMath();
-      }
-
-      /* --- KaTeX auto-render виклик --- */
-      function renderMath() {
-        if (typeof renderMathInElement === 'function') {
-          renderMathInElement(document.getElementById('quiz-root'), {
-            delimiters: [
-              { left: "\\(", right: "\\)", display: false },
-              { left: "\\[", right: "\\]", display: true }
-            ],
-            throwOnError: false
+      LESSON_DATA.exercises.forEach(section => {
+        const sec = document.createElement('section');
+        sec.className = 'exercise-block';
+        const h = document.createElement('h3');
+        h.textContent = section.title;
+        sec.appendChild(h);
+        if(section.desc){
+          const p = document.createElement('p');
+          p.textContent = section.desc;
+          sec.appendChild(p);
+        }
+        if(section.visual){
+          const v = document.createElement('div');
+          v.innerHTML = section.visual;
+          sec.appendChild(v);
+        }
+        if(Array.isArray(section.tasks) && section.tasks.length){
+          section.tasks.forEach(task => {
+            const t = document.createElement('div');
+            t.className = 'task-item';
+            t.innerHTML = `<div><strong>${task.id}.</strong> <span class="question">${task.q}</span></div>`;
+            const ig = document.createElement('div'); ig.className='input-group';
+            const input = document.createElement('input'); input.type='text'; input.placeholder='Ваша відповідь'; input.dataset.answer = String(task.a);
+            const btn = document.createElement('button'); btn.className='btn-check'; btn.textContent='Перевірити';
+            btn.onclick = () => checkAnswer(input, task.a);
+            const solBtn = document.createElement('button'); solBtn.className='sol-btn'; solBtn.textContent='Показати розв\'язання';
+            const solBox = document.createElement('div'); solBox.className='hidden-box'; solBox.innerHTML = `<strong>Відповідь:</strong> ${task.a}<br><strong>Розв'язання:</strong> ${task.solution || ''}`;
+            solBtn.onclick = () => solBox.style.display = solBox.style.display === 'block' ? 'none' : 'block';
+            ig.appendChild(input); ig.appendChild(btn); ig.appendChild(solBtn);
+            t.appendChild(ig); t.appendChild(solBox);
+            sec.appendChild(t);
           });
         }
-      }
-
-      /* --- Статистика --- */
-      function incrementStat(kind) {
-        if (kind === 'correct') {
-          const el = document.getElementById('val-correct');
-          el.textContent = Number(el.textContent) + 1;
-        } else {
-          const el = document.getElementById('val-wrong');
-          el.textContent = Number(el.textContent) + 1;
-        }
-      }
-
-      function finishLesson() {
-        alert('Урок завершено. Результати збережено локально (демо).');
-      }
-
-      /* --- Дошка: просте ініціалізування та масштабування canvas --- */
-      const canvas = document.getElementById('board');
-      const ctx = canvas.getContext('2d');
-      let currentTool = 'pen';
-      function setTool(tool) {
-        currentTool = tool;
-        document.querySelectorAll('.btn-tool').forEach(b => b.classList.remove('active'));
-        if (tool === 'pen') document.getElementById('t-pen').classList.add('active');
-        if (tool === 'eraser') document.getElementById('t-eraser').classList.add('active');
-      }
-
-      function resizeCanvas() {
-        const ratio = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = Math.round(rect.width * ratio);
-        canvas.height = Math.round(rect.height * ratio);
-        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.lineWidth = 2;
-        // початкове очищення
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-      window.addEventListener('resize', resizeCanvas);
-      // Виклик після завантаження DOM
-      window.addEventListener('load', () => {
-        resizeCanvas();
-        renderLessonData();
+        root.appendChild(sec);
       });
 
-      function clearCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-      function drawGrid() {
-        const rect = canvas.getBoundingClientRect();
-        const step = 25;
-        ctx.save();
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = '#eef2f7';
-        ctx.lineWidth = 1;
-        for (let x = 0; x < rect.width; x += step) {
-          ctx.beginPath();
-          ctx.moveTo(x + 0.5, 0);
-          ctx.lineTo(x + 0.5, rect.height);
-          ctx.stroke();
-        }
-        for (let y = 0; y < rect.height; y += step) {
-          ctx.beginPath();
-          ctx.moveTo(0, y + 0.5);
-          ctx.lineTo(rect.width, y + 0.5);
-          ctx.stroke();
-        }
-        ctx.restore();
-      }
-
-      function toggleBoard() {
-        const b = document.getElementById('board-section');
-        b.style.display = (b.style.display === 'none') ? 'flex' : 'flex';
-        // якщо потрібно ховати/показувати, можна змінити на 'none'/'flex'
-        if (b.style.display === 'none') {
-          document.getElementById('toggle-board-btn').setAttribute('aria-pressed', 'false');
-        } else {
-          document.getElementById('toggle-board-btn').setAttribute('aria-pressed', 'true');
-        }
-      }
-
-      // Простий інтерфейс малювання (демо)
-      let drawing = false;
-      let last = { x: 0, y: 0 };
-      canvas.addEventListener('pointerdown', (e) => {
-        drawing = true;
-        last = { x: e.offsetX, y: e.offsetY };
+      // рендер формул KaTeX
+      renderMathInElement(document.getElementById('quiz-root'), {
+        delimiters: [{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],
+        throwOnError:false
       });
-      canvas.addEventListener('pointermove', (e) => {
-        if (!drawing) return;
-        if (currentTool === 'eraser') {
-          ctx.globalCompositeOperation = 'destination-out';
-          ctx.lineWidth = 12;
-        } else {
-          ctx.globalCompositeOperation = 'source-over';
-          ctx.lineWidth = 2;
-        }
-        ctx.beginPath();
-        ctx.moveTo(last.x, last.y);
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.strokeStyle = '#111827';
-        ctx.stroke();
-        last = { x: e.offsetX, y: e.offsetY };
-      });
-      canvas.addEventListener('pointerup', () => drawing = false);
-      canvas.addEventListener('pointerleave', () => drawing = false);
+    }
 
-      // Функції-заглушки, якщо ваші зовнішні скрипти очікують їх
-      function drawSystem() { drawGrid(); }
-      function clearCanvasSafe() { clearCanvas(); }
-      function setToolPen() { setTool('pen'); }
-    </script>
-  </body>
-</html>
-```
+    /* ---------- Перевірка відповідей (гнучка) ---------- */
+    function normalize(s){
+      if(s === null || s === undefined) return '';
+      return String(s).trim().replace(',', '.');
+    }
+    function isNumericString(s){
+      return /^-?\d+(\.\d+)?$/.test(s);
+    }
+    function checkAnswer(inputEl, correct){
+      const user = normalize(inputEl.value);
+      const corr = normalize(correct);
+      // якщо обидва числа — порівнюємо чисельно
+      if(isNumericString(user) && isNumericString(corr)){
+        const nu = Number(user), nc = Number(corr);
+        if(Math.abs(nu - nc) < 1e-9){
+          markCorrect(inputEl);
+        } else markWrong(inputEl);
+      } else {
+        // текстове порівняння (регістр не важливий)
+        if(user.toLowerCase() === corr.toLowerCase()){
+          markCorrect(inputEl);
+        } else markWrong(inputEl);
+      }
+    }
+    function markCorrect(el){ el.classList.remove('wrong'); el.classList.add('correct'); incrementStat('correct'); }
+    function markWrong(el){ el.classList.remove('correct'); el.classList.add('wrong'); incrementStat('wrong'); }
+
+    function incrementStat(kind){
+      if(kind==='correct'){
+        const el=document.getElementById('val-correct'); el.textContent = Number(el.textContent)+1;
+      } else {
+        const el=document.getElementById('val-wrong'); el.textContent = Number(el.textContent)+1;
+      }
+    }
+
+    function finishLesson(){ alert('Урок завершено.'); }
+
+    /* ---------- Canvas: розміри та просте малювання ---------- */
+    const canvas = document.getElementById('board');
+    const ctx = canvas.getContext('2d');
+    function resizeCanvas(){
+      const ratio = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.round(rect.width * ratio);
+      canvas.height = Math.round(rect.height * ratio);
+      ctx.setTransform(ratio,0,0,ratio,0,0);
+      ctx.lineCap='round'; ctx.lineJoin='round'; ctx.lineWidth=2;
+      ctx.clearRect(0,0,rect.width,rect.height);
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    let tool='pen';
+    function setTool(t){ tool=t; document.querySelectorAll('.btn-tool').forEach(b=>b.classList.remove('active')); if(t==='pen') document.getElementById('t-pen').classList.add('active'); else document.getElementById('t-eraser').classList.add('active'); }
+    function clearCanvas(){ ctx.clearRect(0,0,canvas.width,canvas.height); }
+    function drawGrid(){
+      const rect = canvas.getBoundingClientRect();
+      const step = 25;
+      ctx.clearRect(0,0,rect.width,rect.height);
+      ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1;
+      for(let x=0;x<rect.width;x+=step){ ctx.beginPath(); ctx.moveTo(x+0.5,0); ctx.lineTo(x+0.5,rect.height); ctx.stroke(); }
+      for(let y=0;y<rect.height;y+=step){ ctx.beginPath(); ctx.moveTo(0,y+0.5); ctx.lineTo(rect.width,y+0.5); ctx.stroke(); }
+    }
+
+    // просте малювання
+    let drawing=false, last={x:0,y:0};
+    canvas.addEventListener('pointerdown', e=>{ drawing=true; last={x:e.offsetX,y:e.offsetY}; });
+    canvas.addEventListener('pointermove', e=>{ if(!
