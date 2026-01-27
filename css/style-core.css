@@ -1,5 +1,18 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
+/* --- БАЗОВІ НАЛАШТУВАННЯ --- */
+:root {
+  --bg-app: #f8fafc;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-sm: 6px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
 body {
   font-family:
     "Inter",
@@ -14,7 +27,6 @@ body {
   background: var(--bg-app);
 }
 
-/* --- СКРОЛБАР --- */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -27,7 +39,7 @@ body {
   border: 2px solid var(--bg-app);
 }
 
-/* --- ЛІВА ПАНЕЛЬ --- */
+/* --- ЛІВА ПАНЕЛЬ (ЗАВДАННЯ) --- */
 #tasks-section {
   flex: 1;
   background: var(--bg-app);
@@ -39,7 +51,7 @@ body {
   z-index: 20;
   position: relative;
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.02);
-  transition: all 0.4s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 header {
@@ -55,6 +67,17 @@ header {
   z-index: 30;
 }
 
+.content-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  padding-bottom: 120px;
+  display: flex;
+  flex-direction: column;
+  /* Центрування по горизонталі для контенту */
+  align-items: stretch;
+}
+
 .btn-home {
   text-decoration: none;
   color: var(--text-main);
@@ -63,31 +86,93 @@ header {
   padding: 8px 12px;
   border-radius: var(--radius-sm);
   transition: 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 .btn-home:hover {
-  background: var(--bg-app);
-  color: var(--primary);
+  background: #eef2ff;
+  color: #4f46e5;
 }
 
-.content-container {
+/* --- ПРАВА ПАНЕЛЬ (ДОШКА) --- */
+#board-section {
   flex: 1;
-  overflow-y: auto;
-  padding: 24px;
-  padding-bottom: 120px;
-  display: flex;
-  flex-direction: column;
+  position: relative;
+  background-color: #fff;
+  background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+  border-left: 1px solid var(--border);
+  cursor: crosshair;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-/* --- ВПРАВИ --- */
+/* =========================================
+   ЛОГІКА ПРИХОВУВАННЯ ДОШКИ (70% ШИРИНИ)
+   ========================================= */
+
+/* 1. Ховаємо дошку */
+body.board-hidden #board-section {
+  flex: 0 0 0 !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  opacity: 0;
+  overflow: hidden !important;
+  border: none !important;
+  margin: 0 !important;
+}
+
+/* 2. Розтягуємо контейнер завдань на весь екран */
+body.board-hidden #tasks-section {
+  flex: 1 !important;
+  max-width: 100% !important;
+  border-right: none !important;
+  background-color: #f1f5f9;
+  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+/* 3. Центруємо контент у колонку */
+body.board-hidden .content-container {
+  align-items: center;
+}
+
+/* 4. ЗАДАЄМО 70% ШИРИНИ ДЛЯ КАРТОК (І для ПК, і для Мобільного) */
+body.board-hidden .exercise-block {
+  width: 70% !important;
+  max-width: none !important;
+  min-width: 300px; /* Мінімальна ширина, щоб на дуже вузьких телефонах не ламалось */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* 5. Футер теж 70% */
+body.board-hidden .lesson-footer-container {
+  width: 70% !important;
+  max-width: none !important;
+  min-width: 300px;
+}
+
+/* 6. Збільшуємо інпути, коли багато місця */
+body.board-hidden input[type="text"] {
+  width: 200px;
+  padding: 10px 14px;
+  font-size: 1.1rem;
+}
+
+/* --- ЗАГАЛЬНІ СТИЛІ ЕЛЕМЕНТІВ --- */
 .exercise-block {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   margin-bottom: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
-
 .exercise-header {
   background: linear-gradient(to bottom, #ffffff, #f8fafc);
   padding: 16px 24px;
@@ -111,10 +196,6 @@ header {
   flex-direction: column;
   gap: 16px;
 }
-.task-row:last-child {
-  border-bottom: none;
-}
-
 .task-content {
   display: flex;
   align-items: baseline;
@@ -122,17 +203,14 @@ header {
   font-size: 1.05rem;
 }
 .task-number {
-  color: var(--primary);
-  background: var(--primary-light);
-  font-weight: 700;
-  font-size: 0.8rem;
   padding: 4px 8px;
   border-radius: 6px;
   min-width: 20px;
   text-align: center;
+  font-weight: 700;
+  font-size: 0.8rem;
 }
 
-/* --- ІНПУТИ ТА КНОПКИ --- */
 .input-group {
   display: flex;
   align-items: center;
@@ -144,10 +222,8 @@ header {
   transition: 0.2s;
 }
 .input-group:focus-within {
-  border-color: var(--primary);
   background: white;
 }
-
 input[type="text"] {
   border: none;
   background: transparent;
@@ -162,18 +238,11 @@ input[type="text"] {
 .btn-check {
   background: white;
   border: 1px solid var(--border);
-  color: var(--primary);
   padding: 8px 12px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
   margin-left: 4px;
-  transition: 0.2s;
-}
-.btn-check:hover:not(:disabled) {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
 }
 .btn-check:disabled {
   opacity: 0.5;
@@ -196,29 +265,42 @@ input[type="text"] {
   font-weight: 500;
   min-width: 80px;
 }
-.option-btn:hover:not(:disabled) {
-  border-color: var(--primary);
-  color: var(--primary);
-  background: var(--primary-light);
-}
 .option-btn:disabled {
   opacity: 0.6;
   cursor: default;
 }
 
-/* --- ДОШКА (ПРАВА ПАНЕЛЬ) --- */
-#board-section {
-  flex: 1;
-  position: relative;
-  background-color: #fff;
-  background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
-  background-size: 24px 24px;
-  border-left: 1px solid var(--border);
+/* --- ІНСТРУМЕНТИ --- */
+.tools {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 8px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
 }
-canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
+.btn-tool {
+  border: none;
+  background: transparent;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+}
+.btn-tool:hover {
+  background: var(--bg-app);
+  color: var(--text-main);
+}
+.btn-tool.active {
+  background: #4f46e5;
+  color: white;
 }
 
 .btn-icon {
@@ -231,42 +313,16 @@ canvas {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 .btn-icon.active {
-  background: var(--primary-light);
-  color: var(--primary);
-  border-color: var(--primary);
+  background: #eef2ff;
+  color: #4f46e5;
+  border-color: #4f46e5;
 }
 
-.tools {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 8px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-.btn-tool {
-  border: none;
-  background: transparent;
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1.2rem;
-  color: var(--text-muted);
-  transition: 0.2s;
-}
-.btn-tool.active {
-  background: var(--primary);
-  color: white;
-}
-
-/* --- НИЖНІЙ ФУТЕР (КНОПКИ) --- */
+/* --- НИЖНЯ ПАНЕЛЬ --- */
 .lesson-footer-container {
   display: flex;
   gap: 16px;
@@ -275,7 +331,6 @@ canvas {
   max-width: 600px;
   justify-content: center;
 }
-
 .btn-finish,
 .btn-lesson-link {
   padding: 14px 20px;
@@ -290,86 +345,112 @@ canvas {
   text-decoration: none;
   border: 2px solid transparent;
 }
-
 .btn-finish {
-  background: linear-gradient(
-    135deg,
-    var(--primary) 0%,
-    var(--primary-hover) 100%
-  );
   color: white;
   flex: 2;
-  box-shadow: 0 10px 20px -5px var(--primary-soft);
   border: none;
 }
 .btn-finish:hover {
   transform: translateY(-2px);
 }
 
-/* --- МОДАЛКА --- */
+/* --- МОДАЛЬНЕ ВІКНО --- */
 .modal-overlay {
-  position: fixed;
+  position: fixed !important;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(5px);
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
   display: none;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 9999 !important;
+  opacity: 0;
+  animation: fadeIn 0.3s forwards;
 }
+
 .modal-content {
-  background: white;
+  background: #ffffff;
   padding: 40px;
   border-radius: 24px;
   text-align: center;
-  max-width: 380px;
   width: 90%;
+  max-width: 360px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  transform: scale(0.95);
+  animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
 .modal-score-circle {
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background: var(--primary-light);
-  color: var(--primary);
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 auto 20px;
   font-size: 2rem;
   font-weight: 800;
-  border: 4px solid white;
-  box-shadow: 0 0 0 4px var(--primary-light);
-}
-.btn-primary {
-  background: var(--primary);
-  color: white;
-  padding: 14px;
-  border-radius: 12px;
-  border: none;
-  width: 100%;
-  font-weight: 600;
-  margin-bottom: 10px;
-  cursor: pointer;
-}
-.btn-secondary {
-  background: transparent;
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-  padding: 14px;
-  border-radius: 12px;
-  width: 100%;
-  font-weight: 600;
-  cursor: pointer;
+  margin-bottom: 20px;
+  background: #ffffff;
+  border: 8px solid #e2e8f0;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-/* --- MEDIA QUERY --- */
+.modal-title {
+  margin: 0 0 10px 0;
+  font-size: 1.5rem;
+  color: #1e293b;
+  font-weight: 800;
+}
+.modal-text {
+  margin: 0 0 24px 0;
+  font-size: 1rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.modal-actions button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.1s;
+}
+.modal-actions button:active {
+  transform: scale(0.98);
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes popIn {
+  to {
+    transform: scale(1);
+  }
+}
+
+/* --- МЕДІА (МОБІЛЬНИЙ АДАПТИВ) --- */
 @media (max-width: 900px) {
   body {
     flex-direction: column;
   }
+
   #board-section {
     height: 40vh;
     order: 1;
@@ -381,8 +462,8 @@ canvas {
     order: 2;
     min-width: auto;
     max-width: none;
-    border-right: none;
   }
+
   .tools {
     top: auto;
     bottom: 16px;
@@ -394,11 +475,16 @@ canvas {
     flex-direction: column-reverse;
   }
 
-  /* Фокус режим */
+  /* Приховування дошки на мобільному */
   body.board-hidden #board-section {
     height: 0 !important;
   }
   body.board-hidden #tasks-section {
     height: 100vh !important;
   }
+
+  /* Тут важливо: ми НЕ перезаписуємо ширину в 100%. 
+     Ми залишаємо 70% (успадковане з верхнього правила для board-hidden),
+     але завдяки min-width: 300px воно не стане надто вузьким.
+  */
 }

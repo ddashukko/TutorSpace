@@ -4,12 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Класна Робота: Множення та Ділення</title>
-    <link rel="stylesheet" href="../css/style-core.css" />
-    <link rel="stylesheet" href="../css/style-lesson.css" />
+
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
     />
+    <link rel="stylesheet" href="../css/style-core.css" />
+    <link rel="stylesheet" href="../css/style-lesson.css" />
   </head>
   <body>
     <div id="tasks-section">
@@ -49,9 +50,12 @@
 
       <div class="content-container">
         <div id="quiz-root"></div>
-        <button class="btn-finish" onclick="finishLesson()">
-          Завершити урок
-        </button>
+
+        <div id="lesson-footer" class="lesson-footer-container">
+          <button class="btn-finish" onclick="finishLesson()">
+            Завершити урок
+          </button>
+        </div>
       </div>
     </div>
 
@@ -86,6 +90,22 @@
     <script>
       const LESSON_DATA = {
         title: "Класна Робота: Інтенсив",
+        type: "lesson", // Стандартний тип
+
+        // --- ПОСИЛАННЯ НА ІНШІ ЧАСТИНИ ---
+        links: [
+          {
+            title: "Домашня",
+            url: "../homeworks/multiplication-division.html",
+            type: "homework",
+          },
+          {
+            title: "Тест",
+            url: "../tests/multiplication-division.html",
+            type: "test",
+          },
+        ],
+        // --------------------------------
 
         exercises: [
           {
@@ -327,18 +347,6 @@
               { id: "3)", q: "$125 \\times 8 = $", a: "1000", type: "input" },
               { id: "4)", q: "$504 \\div 6 = $", a: "84", type: "input" },
             ],
-          },
-        ],
-        links: [
-          {
-            title: "Домашня робота",
-            url: "../homeworks/multiplication-division.html", // Вкажіть правильний шлях
-            type: "homework",
-          },
-          {
-            title: "Пройти тест",
-            url: "../tests/multiplication-division.html", // Вкажіть правильний шлях
-            type: "test",
           },
         ],
       };

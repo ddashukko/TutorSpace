@@ -4,54 +4,37 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Домашня Робота: Множення та Ділення</title>
-    <link rel="stylesheet" href="../css/style-core.css" />
-    <link rel="stylesheet" href="../css/style-homework.css" />
+
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
     />
+    <link rel="stylesheet" href="../css/style-core.css" />
+    <link rel="stylesheet" href="../css/style-homework.css" />
   </head>
   <body>
     <div id="tasks-section">
       <header>
         <a href="../index.html" class="btn-home">← Назад</a>
-        <div
-          id="lesson-title-display"
-          style="font-weight: 700; font-size: 1.1rem; text-align: center"
-        >
-          Завантаження уроку...
+        <div id="lesson-title-display" style="font-weight: 700">
+          Завантаження...
         </div>
         <div class="stats-container">
           ✅ <span id="val-correct">0</span> ❌ <span id="val-wrong">0</span>
         </div>
-        <button
-          id="toggle-board-btn"
-          class="btn-icon"
-          title="Сховати/Показати дошку"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="3" y1="9" x2="21" y2="9"></line>
-            <line x1="9" y1="21" x2="9" y2="9"></line>
-          </svg>
+        <button id="toggle-board-btn" class="btn-icon">
           <span>Дошка</span>
         </button>
       </header>
 
       <div class="content-container">
         <div id="quiz-root"></div>
-        <button class="btn-finish" onclick="finishLesson()">
-          Завершити урок
-        </button>
+
+        <div id="lesson-footer" class="lesson-footer-container">
+          <button class="btn-finish" onclick="finishLesson()">
+            Завершити урок
+          </button>
+        </div>
       </div>
     </div>
 
@@ -63,7 +46,6 @@
         <button class="btn-tool" onclick="setTool('eraser')" id="t-eraser">
           🧹
         </button>
-        <button class="btn-tool" onclick="drawSystem()">📉</button>
         <button class="btn-tool" onclick="clearCanvasSafe()" style="color: red">
           ❌
         </button>
@@ -86,6 +68,17 @@
     <script>
       const LESSON_DATA = {
         title: "Домашня Робота: Множення та Ділення",
+        type: "homework",
+
+        // Посилання назад на урок (опціонально)
+        links: [
+          {
+            title: "До уроку",
+            url: "../lessons/multiplication-division.html",
+            type: "homework",
+          },
+        ],
+
         exercises: [
           {
             id: "info",

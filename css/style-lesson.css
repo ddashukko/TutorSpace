@@ -1,67 +1,94 @@
 :root {
-  /* СИНЯ ТЕМА */
   --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --primary-light: #eef2ff;
-  --primary-soft: rgba(79, 70, 229, 0.1);
-
   --success: #10b981;
   --error: #ef4444;
-
-  --text-main: #1e293b;
-  --text-muted: #64748b;
-  --bg-app: #f8fafc;
-  --surface: #ffffff;
-  --border: #e2e8f0;
-
-  --radius-lg: 16px;
-  --radius-md: 10px;
-  --radius-sm: 6px;
 }
 
-/* Статистика (тільки в уроках і домашці видно) */
+/* Статистика */
 .stats-container {
   display: flex;
   gap: 16px;
-  background: var(--surface);
+  background: white;
   padding: 6px 14px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
   font-size: 0.9rem;
   font-weight: 700;
 }
-
-/* Візуалізація відповідей (відразу) */
-input.correct {
+#val-correct {
   color: var(--success);
-  font-weight: bold;
+}
+#val-wrong {
+  color: var(--error);
+}
+
+/* Елементи */
+.task-number {
+  background: #eef2ff;
+  color: var(--primary);
+}
+.input-group:focus-within {
+  border-color: var(--primary);
+}
+.btn-check {
+  color: var(--primary);
+}
+.btn-check:hover:not(:disabled) {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.btn-finish {
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+  box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.3);
+}
+
+/* --- ВАЛІДАЦІЯ (Заливка фону) --- */
+input.correct {
+  background-color: #dcfce7 !important;
+  color: #166534 !important;
+  border-color: #22c55e !important;
+  font-weight: 700;
 }
 input.wrong {
-  color: var(--error);
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+  border-color: #ef4444 !important;
   text-decoration: line-through;
 }
 
 .option-btn.selected-correct {
-  background: var(--success);
-  color: white;
-  border-color: var(--success);
+  background: #22c55e !important;
+  color: white !important;
+  border-color: #22c55e !important;
 }
 .option-btn.selected-wrong {
-  background: var(--error);
-  color: white;
-  border-color: var(--error);
+  background: #ef4444 !important;
+  color: white !important;
+  border-color: #ef4444 !important;
 }
 
-/* Стилі кнопок навігації */
+/* Кнопки навігації */
 .btn-lesson-link.homework {
   background: white;
   color: var(--primary);
-  border-color: var(--primary-light);
+  border-color: #e0e7ff;
   flex: 1;
+}
+.btn-lesson-link.homework:hover {
+  background: #eef2ff;
+  border-color: var(--primary);
+  transform: translateY(-2px);
 }
 .btn-lesson-link.test {
   background: #fff7ed;
   color: #c2410c;
-  border-color: #fed7aa;
+  border-color: #ffedd5;
   flex: 1;
+}
+.btn-lesson-link.test:hover {
+  background: #ffedd5;
+  border-color: #fb923c;
+  transform: translateY(-2px);
 }

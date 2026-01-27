@@ -4,7 +4,7 @@ const boardSection = document.getElementById("board-section");
 let painting = false;
 let tool = "pen";
 
-// --- Логіка малювання ---
+// Ініціалізація розміру
 function resizeCanvas() {
   const temp = document.createElement("canvas");
   const tempCtx = temp.getContext("2d");
@@ -22,6 +22,7 @@ function resizeCanvas() {
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("load", resizeCanvas);
 
+// Малювання
 function startPosition(e) {
   painting = true;
   draw(e);
@@ -60,6 +61,7 @@ canvas.addEventListener("touchstart", startPosition);
 canvas.addEventListener("touchend", finishedPosition);
 canvas.addEventListener("touchmove", draw);
 
+// Інструменти
 function setTool(t) {
   tool = t;
   document
@@ -75,39 +77,25 @@ function clearCanvasSafe() {
 }
 
 function drawSystem() {
-  // Тут буде код малювання системи
   alert("Координатна пряма (заготовка)");
 }
 
-// --- Логіка кнопки приховування (FIXED) ---
+// ЛОГІКА КНОПКИ "ДОШКА"
 document.addEventListener("DOMContentLoaded", () => {
-  // Ініціалізація дошки
   resizeCanvas();
 
-  // Логіка кнопки
   const toggleBtn = document.getElementById("toggle-board-btn");
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => {
+      // Перемикаємо клас
+      document.body.classList.toggle("board-hidden");
 
-  if (!toggleBtn) return; // Якщо кнопки немає на сторінці, виходимо
+      // Міняємо вигляд кнопки
+      const isHidden = document.body.classList.contains("board-hidden");
+      toggleBtn.classList.toggle("active", !isHidden);
 
-  toggleBtn.addEventListener("click", () => {
-    // 1. Перемикаємо клас на body
-    document.body.classList.toggle("board-hidden");
-
-    // 2. Перевіряємо стан
-    const isHidden = document.body.classList.contains("board-hidden");
-
-    // 3. Змінюємо вигляд кнопки
-    toggleBtn.classList.toggle("active", !isHidden);
-    const span = toggleBtn.querySelector("span");
-    if (span) {
-      span.innerText = isHidden ? "Показати дошку" : "Дошка";
-    }
-
-    // 4. Якщо дошку відкрили, треба оновити Canvas, бо його розмір змінився
-    if (!isHidden) {
-      setTimeout(() => {
-        resizeCanvas();
-      }, 450); // Чекаємо завершення анімації (0.4s) + запас
-    }
-  });
+      // Оновлюємо Canvas із затримкою (щоб transition css встиг пройти)
+      setTimeout(resizeCanvas, 350);
+    });
+  }
 });
