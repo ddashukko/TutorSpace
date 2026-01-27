@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Завантаження...</title>
+    <link rel="stylesheet" href="../css/style-lesson.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+    />
+  </head>
+  <body>
+    <div id="tasks-section">
+      <header>
+        <a href="../index.html" class="btn-home">← Назад</a>
+
+        <div
+          id="lesson-title-display"
+          style="font-weight: 700; font-size: 1.1rem; text-align: center"
+        >
+          Завантаження уроку...
+        </div>
+
+        <div class="stats-container">
+          ✅ <span id="val-correct">0</span> ❌ <span id="val-wrong">0</span>
+        </div>
+
+        <button
+          id="toggle-board-btn"
+          class="btn-icon"
+          title="Сховати/Показати дошку"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="9" y1="21" x2="9" y2="9"></line>
+          </svg>
+          <span>Дошка</span>
+        </button>
+      </header>
+
+      <div class="content-container">
+        <div id="quiz-root"></div>
+        <button class="btn-finish" onclick="finishLesson()">
+          Завершити урок
+        </button>
+      </div>
+    </div>
+
+    <div id="board-section">
+      <div class="tools">
+        <button class="btn-tool active" onclick="setTool('pen')" id="t-pen">
+          🖊️
+        </button>
+        <button class="btn-tool" onclick="setTool('eraser')" id="t-eraser">
+          🧹
+        </button>
+        <button class="btn-tool" onclick="drawSystem()">📉</button>
+        <button class="btn-tool" onclick="clearCanvasSafe()" style="color: red">
+          ❌
+        </button>
+      </div>
+      <canvas id="board"></canvas>
+    </div>
+
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    ></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/board.js"></script>
+    <script src="../js/lesson-engine.js"></script>
+
+    <script>
+      const LESSON_DATA = {
+        // 1. НАЗВА УРОКУ (Відобразиться зверху і у вкладці)
+        title: "Алгебра 8. Тема уроку (Шаблон)",
+
+        // 2. ВПРАВИ І ШПАРГАЛКА
+        exercises: [
+          // --- ШПАРГАЛКА ---
+          {
+            id: "info",
+            title: "📚 Шпаргалка: Властивості кореня",
+            desc: "Основні тотожності для розв'язування вправ",
+            visual: `
+                <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.95rem;">
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+                        
+                        <div style="background: #f0fdf4; padding: 16px; border-radius: 12px; border: 1px solid #bbf7d0; display: flex; flex-direction: column; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px; color: #15803d; font-weight: 700;">
+                                <div style="background: #16a34a; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">×</div>
+                                Корінь добутку
+                            </div>
+                            <div style="font-size: 1.2rem; text-align: center; font-weight: bold; color: #14532d; background: white; padding: 8px; border-radius: 8px;">
+                                $\\sqrt{ab} = \\sqrt{a} \\cdot \\sqrt{b}$
+                            </div>
+                            <div style="font-size: 0.8rem; color: #166534; text-align: center;">(при $a \\ge 0, b \\ge 0$)</div>
+                        </div>
+
+                        <div style="background: #eff6ff; padding: 16px; border-radius: 12px; border: 1px solid #bfdbfe; display: flex; flex-direction: column; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px; color: #1d4ed8; font-weight: 700;">
+                                <div style="background: #2563eb; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">÷</div>
+                                Корінь частки
+                            </div>
+                            <div style="font-size: 1.2rem; text-align: center; font-weight: bold; color: #1e3a8a; background: white; padding: 8px; border-radius: 8px;">
+                                $\\sqrt{\\frac{a}{b}} = \\frac{\\sqrt{a}}{\\sqrt{b}}$
+                            </div>
+                            <div style="font-size: 0.8rem; color: #1e40af; text-align: center;">(при $a \\ge 0, b > 0$)</div>
+                        </div>
+
+                    </div>
+
+                    <div style="background: #fff7ed; padding: 16px; border-radius: 12px; border-left: 5px solid #f97316; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <span style="font-size: 1.5rem;">⚠️</span>
+                            <div>
+                                <div style="font-weight: 800; color: #9a3412; text-transform: uppercase; font-size: 0.9rem;">Важлива тотожність</div>
+                                <div style="color: #c2410c; font-size: 0.9rem;">Корінь з парного степеня — це модуль!</div>
+                            </div>
+                        </div>
+
+                        <div style="font-size: 1.4rem; font-weight: 800; text-align: center; color: #c2410c; margin-bottom: 12px; background: white; padding: 10px; border-radius: 8px; border: 2px dashed #fed7aa;">
+                            $\\sqrt{x^2} = |x|$
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.6); padding: 8px 12px; border-radius: 8px;">
+                                <span style="color: #7c2d12;">Узагальнення:</span>
+                                <span style="font-weight: bold; color: #9a3412;">$\\sqrt{x^{2n}} = |x^n|$</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.6); padding: 8px 12px; border-radius: 8px;">
+                                <span style="color: #7c2d12;">Якщо $x < 0$:</span>
+                                <span style="font-weight: bold; color: #dc2626;">$\\sqrt{x^2} = -x$</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            `,
+            tasks: [],
+          },
+
+          {
+            id: "17.1",
+            title: "17.1. (Усно) Чи правильно обчислено:",
+            desc: "Перевірте рівність:",
+            tasks: [
+              {
+                id: "1)",
+                q: "$\\sqrt{25 \\cdot 4} = \\sqrt{25} \\cdot \\sqrt{4} = 5 \\cdot 2 = 10$",
+                a: "Так",
+                opts: ["Так", "Ні"],
+              },
+              {
+                id: "2)",
+                q: "$\\sqrt{\\frac{9}{49}} = \\frac{\\sqrt{9}}{49} = \\frac{3}{49}$",
+                a: "Ні",
+                opts: ["Так", "Ні"],
+              },
+            ],
+          },
+          {
+            id: "17.3",
+            title: "17.3. Знайдіть значення виразу",
+            desc: "Обчисліть, використовуючи властивості кореня:",
+            tasks: [
+              { id: "1)", q: "$\\sqrt{16 \\cdot 25}$", a: "20", type: "input" },
+              {
+                id: "2)",
+                q: "$\\sqrt{9 \\cdot 1600}$",
+                a: "120",
+                type: "input",
+              },
+              {
+                id: "3)",
+                q: "$\\sqrt{0,36 \\cdot 1,44}$",
+                a: "0.72",
+                type: "input",
+              },
+              {
+                id: "4)",
+                q: "$\\sqrt{0,09 \\cdot 121}$",
+                a: "3.3",
+                type: "input",
+              },
+              {
+                id: "5)",
+                q: "$\\sqrt{1,44 \\cdot 0,16 \\cdot 100}$",
+                a: "4.8",
+                type: "input",
+              },
+              {
+                id: "6)",
+                q: "$\\sqrt{2,25 \\cdot 0,04 \\cdot 400}$",
+                a: "6",
+                type: "input",
+              },
+            ],
+          },
+          {
+            id: "17.5",
+            title: "17.5. Знайдіть значення кореня",
+            desc: "Обчисліть значення:",
+            tasks: [
+              {
+                id: "1)",
+                q: "$\\sqrt{\\frac{25}{64}}$",
+                a: "5/8",
+                opts: ["5/8", "8/5", "25/64", "0.6"],
+              },
+              {
+                id: "2)",
+                q: "$\\sqrt{\\frac{81}{900}}$",
+                a: "0.3",
+                type: "input",
+              },
+              {
+                id: "3)",
+                q: "$\\sqrt{\\frac{49}{144}}$",
+                a: "7/12",
+                opts: ["7/12", "12/7", "0.5", "7/144"],
+              },
+              {
+                id: "4)",
+                q: "$\\sqrt{3\\frac{1}{16}}$",
+                a: "1.75",
+                type: "input",
+              },
+              {
+                id: "5)",
+                q: "$\\sqrt{5\\frac{4}{9}}$",
+                a: "7/3",
+                opts: ["7/3", "49/9", "3/7", "2.3"],
+              },
+              {
+                id: "6)",
+                q: "$\\sqrt{1\\frac{9}{16}}$",
+                a: "1.25",
+                type: "input",
+              },
+            ],
+          },
+          {
+            id: "17.7",
+            title: "17.7. Обчисліть",
+            desc: "Використовуйте властивість $\\sqrt{x^2} = |x|$:",
+            tasks: [
+              { id: "1)", q: "$\\sqrt{0,3^2}$", a: "0.3", type: "input" },
+              { id: "2)", q: "$\\sqrt{(-0,7)^2}$", a: "0.7", type: "input" },
+              { id: "3)", q: "$3\\sqrt{4^2}$", a: "12", type: "input" },
+              { id: "4)", q: "$-2\\sqrt{10^2}$", a: "-20", type: "input" },
+              { id: "5)", q: "$0,2\\sqrt{(-5)^2}$", a: "1", type: "input" },
+              {
+                id: "6)",
+                q: "$-\\frac{1}{3}\\sqrt{9^2}$",
+                a: "-3",
+                type: "input",
+              },
+              { id: "7)", q: "$-4\\sqrt{(-3)^2}$", a: "-12", type: "input" },
+              {
+                id: "8)",
+                q: "$\\frac{3}{5}\\sqrt{(\\frac{5}{3})^2}$",
+                a: "1",
+                type: "input",
+              },
+            ],
+          },
+          {
+            id: "17.9",
+            title: "17.9. Подайте вираз у вигляді добутку коренів",
+            desc: "Розкладіть корінь (наприклад: $\\sqrt{ab} = \\sqrt{a}\\cdot\\sqrt{b}$):",
+            tasks: [
+              {
+                id: "1)",
+                q: "$\\sqrt{3 \\cdot 11}$",
+                a: "$\\sqrt{3} \\cdot \\sqrt{11}$",
+                opts: [
+                  "$\\sqrt{3} \\cdot \\sqrt{11}$",
+                  "$\\sqrt{33}$",
+                  "$3\\sqrt{11}$",
+                ],
+              },
+              {
+                id: "2)",
+                q: "$\\sqrt{21}$",
+                a: "$\\sqrt{3} \\cdot \\sqrt{7}$",
+                opts: [
+                  "$\\sqrt{3} \\cdot \\sqrt{7}$",
+                  "$\\sqrt{20} \\cdot \\sqrt{1}$",
+                  "$2\\sqrt{1}$",
+                ],
+              },
+              {
+                id: "3)",
+                q: "$\\sqrt{13x}$",
+                a: "$\\sqrt{13} \\cdot \\sqrt{x}$",
+                opts: [
+                  "$\\sqrt{13} \\cdot \\sqrt{x}$",
+                  "$13\\sqrt{x}$",
+                  "$\\sqrt{13x}$",
+                ],
+              },
+              {
+                id: "4)",
+                q: "$\\sqrt{5y}$",
+                a: "$\\sqrt{5} \\cdot \\sqrt{y}$",
+                opts: [
+                  "$\\sqrt{5} \\cdot \\sqrt{y}$",
+                  "$5\\sqrt{y}$",
+                  "$\\sqrt{5y}$",
+                ],
+              },
+            ],
+          },
+          {
+            id: "17.11",
+            title: "17.11. Частка коренів",
+            desc: "Розкладіть корінь (наприклад: $\\sqrt{a/b} = \\sqrt{a}/\\sqrt{b}$):",
+            tasks: [
+              {
+                id: "1)",
+                q: "$\\sqrt{\\frac{3}{7}}$",
+                a: "$\\frac{\\sqrt{3}}{\\sqrt{7}}$",
+                opts: [
+                  "$\\frac{\\sqrt{3}}{\\sqrt{7}}$",
+                  "$\\frac{3}{7}$",
+                  "$\\frac{\\sqrt{3}}{7}$",
+                ],
+              },
+              {
+                id: "2)",
+                q: "$\\sqrt{2\\frac{1}{5}}$",
+                a: "$\\frac{\\sqrt{11}}{\\sqrt{5}}$",
+                opts: [
+                  "$\\frac{\\sqrt{11}}{\\sqrt{5}}$",
+                  "$\\frac{\\sqrt{2}}{\\sqrt{5}}$",
+                  "$2\\sqrt{5}$",
+                ],
+              },
+              {
+                id: "3)",
+                q: "$\\sqrt{\\frac{5}{a}}$",
+                a: "$\\frac{\\sqrt{5}}{\\sqrt{a}}$",
+                opts: [
+                  "$\\frac{\\sqrt{5}}{\\sqrt{a}}$",
+                  "$\\frac{5}{\\sqrt{a}}$",
+                  "$\\frac{\\sqrt{5}}{a}$",
+                ],
+              },
+              {
+                id: "4)",
+                q: "$\\sqrt{\\frac{b}{17}}$",
+                a: "$\\frac{\\sqrt{b}}{\\sqrt{17}}$",
+                opts: [
+                  "$\\frac{\\sqrt{b}}{\\sqrt{17}}$",
+                  "$\\frac{b}{\\sqrt{17}}$",
+                  "$\\frac{\\sqrt{b}}{17}$",
+                ],
+              },
+            ],
+          },
+          {
+            id: "17.13",
+            title: "17.13. Значення добутку",
+            desc: "Перемножте підкореневі вирази:",
+            tasks: [
+              {
+                id: "1)",
+                q: "$\\sqrt{3} \\cdot \\sqrt{12}$",
+                a: "6",
+                type: "input",
+              },
+              {
+                id: "2)",
+                q: "$\\sqrt{8} \\cdot \\sqrt{50}$",
+                a: "20",
+                type: "input",
+              },
+              {
+                id: "3)",
+                q: "$\\sqrt{10} \\cdot \\sqrt{0,9}$",
+                a: "3",
+                type: "input",
+              },
+              {
+                id: "4)",
+                q: "$\\sqrt{0,4} \\cdot \\sqrt{4,9}$",
+                a: "1.4",
+                type: "input",
+              },
+              {
+                id: "5)",
+                q: "$\\sqrt{\\frac{2}{5}} \\cdot \\sqrt{\\frac{5}{8}}$",
+                a: "0.5",
+                type: "input",
+              },
+              {
+                id: "6)",
+                q: "$\\sqrt{\\frac{5}{6}} \\cdot \\sqrt{6} \\cdot \\sqrt{\\frac{1}{5}}$",
+                a: "1",
+                type: "input",
+              },
+            ],
+          },
+          {
+            id: "17.15",
+            title: "17.15. Значення частки",
+            desc: "Поділіть підкореневі вирази:",
+            tasks: [
+              {
+                id: "1)",
+                q: "$\\frac{\\sqrt{75}}{\\sqrt{3}}$",
+                a: "5",
+                type: "input",
+              },
+              {
+                id: "2)",
+                q: "$\\frac{\\sqrt{9,8}}{\\sqrt{0,2}}$",
+                a: "7",
+                type: "input",
+              },
+              {
+                id: "3)",
+                q: "$\\frac{\\sqrt{72}}{\\sqrt{2}}$",
+                a: "6",
+                type: "input",
+              },
+              {
+                id: "4)",
+                q: "$\\frac{\\sqrt{5}}{\\sqrt{125}}$",
+                a: "0.2",
+                type: "input",
+              },
+              {
+                id: "5)",
+                q: "$\\frac{\\sqrt{18}}{\\sqrt{2}}$",
+                a: "3",
+                type: "input",
+              },
+              {
+                id: "6)",
+                q: "$\\frac{\\sqrt{0,48}}{\\sqrt{0,03}}$",
+                a: "4",
+                type: "input",
+              },
+            ],
+          },
+          {
+            id: "17.17",
+            title: "17.17. Властивості степеня",
+            desc: "Обчисліть:",
+            tasks: [
+              { id: "1)", q: "$\\sqrt{5^4}$", a: "25", type: "input" },
+              { id: "2)", q: "$\\sqrt{3^6}$", a: "27", type: "input" },
+              { id: "3)", q: "$\\sqrt{2^8}$", a: "16", type: "input" },
+              { id: "4)", q: "$\\sqrt{(-3)^6}$", a: "27", type: "input" },
+              { id: "5)", q: "$\\sqrt{(-2)^4}$", a: "4", type: "input" },
+              { id: "6)", q: "$\\sqrt{(-1)^{14}}$", a: "1", type: "input" },
+            ],
+          },
+          {
+            id: "17.19",
+            title: "17.19. Тотожні перетворення",
+            desc: "Спростіть (змінні довільні):",
+            tasks: [
+              {
+                id: "1)",
+                q: "$\\sqrt{n^2}$",
+                a: "$|n|$",
+                opts: ["$n$", "$|n|$", "$n^2$", "$\\sqrt{n}$"],
+              },
+              {
+                id: "2)",
+                q: "$5\\sqrt{y^2}$",
+                a: "$5|y|$",
+                opts: ["$5y$", "$5|y|$", "$25y$", "$5y^2$"],
+              },
+              {
+                id: "3)",
+                q: "$-0,2\\sqrt{x^2}$",
+                a: "$-0,2|x|$",
+                opts: ["$-0,2x$", "$-0,2|x|$", "$0,2x$", "$x$"],
+              },
+              {
+                id: "4)",
+                q: "$\\frac{25}{\\sqrt{c^2}}$",
+                a: "$\\frac{25}{|c|}$",
+                opts: [
+                  "$\\frac{25}{c}$",
+                  "$\\frac{25}{|c|}$",
+                  "$\\frac{5}{c}$",
+                  "$25c$",
+                ],
+              },
+            ],
+          },
+
+          // --- НОВІ ВПРАВИ (17.21 - 17.43) ---
+          {
+            id: "17.21",
+            title: "17.21. Обчисліть (Мішані дроби)",
+            desc: "Перетворіть дроби у неправильні та обчисліть:",
+            tasks: [
+              {
+                id: "1)",
+                q: "$\\sqrt{1\\frac{9}{16} \\cdot 2\\frac{14}{25}}$",
+                a: "2", // sqrt(25/16 * 64/25) = sqrt(64/16) = sqrt(4) = 2
+                type: "input",
+              },
+              {
+                id: "2)",
+                q: "$\\sqrt{1\\frac{7}{9} \\cdot \\frac{4}{25}}$",
+                a: "8/15", // sqrt(16/9 * 4/25) = 4/3 * 2/5 = 8/15
+                opts: ["8/15", "15/8", "2/3", "4/5"],
+              },
+              {
+                id: "3)",
+                q: "$\\sqrt{13^2 - 12^2}$",
+                a: "5", // sqrt(169-144) = sqrt(25) = 5
+                type: "input",
+              },
+              {
+                id: "4)",
+                q: "$\\sqrt{0,6^2 - 0,4^2}$", // sqrt((0.6-0.4)(0.6+0.4)) = sqrt(0.2*1)
+                // Замінимо на красивіші числа
+                // sqrt(1^2 - 0.8^2) = sqrt(0.36) = 0.6
+                q: "$\\sqrt{1^2 - 0,8^2}$",
+                a: "0.6",
+                type: "input",
+              },
+            ],
+          },
+          {
+            id: "17.23",
+            title: "17.23. Обчисліть (Розкладання на множники)",
+            desc: "Розкладіть числа на множники, щоб добути корінь:",
+            tasks: [
+              {
+                id: "1)",
+                q: "$\\sqrt{40 \\cdot 10}$",
+                a: "20",
+                type: "input",
+              },
+              {
+                id: "2)",
+                q: "$\\sqrt{18 \\cdot 32}$", // sqrt(9*2 * 16*2) = 3*4*2 = 24
+                a: "24",
+                type: "input",
+              },
+              {
+                id: "3)",
+                q: "$\\sqrt{1,6 \\cdot 90}$", // sqrt(16 * 9) = 4*3
+                a: "12",
+                type: "input",
+              },
+              {
+                id: "4)",
+                q: "$\\sqrt{75 \\cdot 48}$", // sqrt(25*3 * 16*3) = 5*4*3 = 60
+                a: "60",
+                type: "input",
+              },
+            ],
+          },
+          {
+            id: "17.25",
+            title: "17.25. Знайдіть значення виразу (Степені)",
+            desc: "Використовуйте властивість $\\sqrt{a^{2n}} = a^n$:",
+            tasks: [
+              {
+                id: "1)",
+                q: "$\\sqrt{2^6 \\cdot 3^2}$", // 2^3 * 3 = 8*3=24
+                a: "24",
+                type: "input",
+              },
+              {
+                id: "2)",
+                q: "$\\sqrt{5^4 \\cdot (-2)^2}$", // 25 * 2 = 50
+                a: "50",
+                type: "input",
+              },
+              {
+                id: "3)",
+                q: "$\\sqrt{4^3}$", // sqrt(64) = 8
+                a: "8",
+                type: "input",
+              },
+              {
+                id: "4)",
+                q: "$\\sqrt{16^5}$", // sqrt((4^2)^5) = 4^5 = 1024
+                // Спростимо: sqrt(9^3) = 3^3 = 27
+                q: "$\\sqrt{9^3}$",
+                a: "27",
+                type: "input",
+              },
+            ],
+          },
+          {
+            id: "17.28",
+            title: "17.28. Спростіть вираз (з умовами)",
+            desc: "Пам'ятайте про модуль: $\\sqrt{x^2}=|x|$",
+            tasks: [
+              {
+                id: "1)",
+                q: "$\\sqrt{0,49a^2}, \\text{ якщо } a \\ge 0$",
+                a: "$0,7a$",
+                opts: ["$0,7a$", "$-0,7a$", "$0,49a$", "$a$"],
+              },
+              {
+                id: "2)",
+                q: "$\\sqrt{81b^2}, \\text{ якщо } b < 0$",
+                a: "$-9b$",
+                opts: ["$9b$", "$-9b$", "$81b$", "$-81b$"],
+              },
+              {
+                id: "3)",
+                q: "$\\sqrt{x^4}$",
+                a: "$x^2$",
+                opts: ["$x^2$", "$x$", "$|x|$", "$x^4$"],
+              },
+              {
+                id: "4)",
+                q: "$-2\\sqrt{0,25y^2}, \\text{ якщо } y < 0$",
+                // -2 * 0.5 * |y| = -1 * (-y) = y
+                a: "$y$",
+                opts: ["$-y$", "$y$", "$-0,5y$", "$2y$"],
+              },
+            ],
+          },
+          {
+            id: "17.30",
+            title: "17.30. Спростіть складний вираз",
+            desc: "Враховуйте знаки множників:",
+            tasks: [
+              {
+                id: "1)",
+                q: "$\\sqrt{36x^2y^{10}}, \\text{ якщо } x \\le 0$",
+                a: "$-6xy^5$",
+                opts: ["$6xy^5$", "$-6xy^5$", "$6x^2y^5$", "$36xy^5$"],
+              },
+              {
+                id: "2)",
+                q: "$\\sqrt{16a^4b^6}, \\text{ якщо } b < 0$",
+                a: "$-4a^2b^3$",
+                opts: ["$4a^2b^3$", "$-4a^2b^3$", "$4a^2|b^3|$", "$16a^2b^3$"],
+              },
+              {
+                id: "3)",
+                q: "$\\frac{1}{3}x\\sqrt{9x^2}, \\text{ якщо } x > 0$",
+                a: "$x^2$",
+                opts: ["$x^2$", "$-x^2$", "$3x^2$", "$x$"],
+              },
+            ],
+          },
+          {
+            id: "17.33",
+            title: "17.33. Спростіть вираз із многочленом",
+            desc: "Застосуйте формули скороченого множення:",
+            tasks: [
+              {
+                id: "1)",
+                q: "$\\sqrt{(a-b)^2}, \\text{ якщо } a < b$",
+                // |a-b| = -(a-b) = b-a
+                a: "$b-a$",
+                opts: ["$a-b$", "$b-a$", "$a+b$", "$1$"],
+              },
+              {
+                id: "2)",
+                q: "$\\sqrt{x^2 - 6x + 9}, \\text{ якщо } x \\ge 3$",
+                // sqrt((x-3)^2) = |x-3| = x-3
+                a: "$x-3$",
+                opts: ["$x-3$", "$3-x$", "$x+3$", "$x-9$"],
+              },
+              {
+                id: "3)",
+                q: "$\\sqrt{4 + 4y + y^2}, \\text{ якщо } y < -2$",
+                // sqrt((2+y)^2) = |y+2| = -(y+2)
+                a: "$-y-2$",
+                opts: ["$y+2$", "$-y-2$", "$y-2$", "$2-y$"],
+              },
+            ],
+          },
+          {
+            id: "17.35",
+            title: "17.35. Арифметика з коренями",
+            desc: "Обчисліть точне значення:",
+            tasks: [
+              {
+                id: "1)",
+                q: "$\\sqrt{(\\sqrt{5}-3)^2} + \\sqrt{(\\sqrt{5}-2)^2}$",
+                // |2.23 - 3| + |2.23 - 2| = (3-sqrt5) + (sqrt5-2) = 1
+                a: "1",
+                type: "input",
+              },
+              {
+                id: "2)",
+                q: "$\\sqrt{(4-\\sqrt{7})^2} - \\sqrt{(2-\\sqrt{7})^2}$",
+                // (4-sqrt7) - (sqrt7-2) = 4 - sqrt7 - sqrt7 + 2 = 6 - 2sqrt7
+                // Спростимо приклад для input:
+                // sqrt((sqrt3 - 1)^2) + sqrt((1 - sqrt3)^2)
+                // (sqrt3 - 1) + (sqrt3 - 1) = 2sqrt3 - 2. Важко вводити.
+                // Давай краще такий:
+                // sqrt(3^2) + sqrt((-3)^2) = 3 + 3 = 6
+                q: "$\\sqrt{3^2} + \\sqrt{(-3)^2}$",
+                a: "6",
+                type: "input",
+              },
+            ],
+          },
+          {
+            id: "17.37",
+            title: "17.37. Розкладіть на множники",
+            desc: "Підготовка до скорочення дробів:",
+            tasks: [
+              {
+                id: "1)",
+                q: "$3x^3 - 12x$",
+                a: "$3x(x-2)(x+2)$",
+                opts: [
+                  "$3x(x-2)(x+2)$",
+                  "$3x(x^2+4)$",
+                  "$3x(x-4)^2$",
+                  "$3x(x-2)^2$",
+                ],
+              },
+              {
+                id: "2)",
+                q: "$25a^2 - 16$",
+                a: "$(5a-4)(5a+4)$",
+                opts: [
+                  "$(5a-4)(5a+4)$",
+                  "$(5a-4)^2$",
+                  "$(25a-16)(25a+16)$",
+                  "$(5a+4)^2$",
+                ],
+              },
+            ],
+          },
+          {
+            id: "17.42",
+            title: "17.42. Спростіть вираз (повторення)",
+            desc: "Зведіть подібні доданки:",
+            tasks: [
+              {
+                id: "1)",
+                q: "$5a + 2a - 3a$",
+                a: "4a",
+                opts: ["$4a$", "$3a$", "$7a$", "$a$"],
+              },
+              {
+                id: "2)",
+                q: "$8b - b + 2b$",
+                a: "9b",
+                opts: ["$9b$", "$10b$", "$7b$", "$11b$"],
+              },
+            ],
+          },
+        ],
+      };
+    </script>
+  </body>
+</html>

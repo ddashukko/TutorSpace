@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Завантаження...</title>
+    <link rel="stylesheet" href="../css/style-lesson.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+    />
+  </head>
+  <body>
+    <div id="tasks-section">
+      <header>
+        <a href="../index.html" class="btn-home">← Назад</a>
+
+        <div
+          id="lesson-title-display"
+          style="font-weight: 700; font-size: 1.1rem; text-align: center"
+        >
+          Завантаження уроку...
+        </div>
+
+        <div class="stats-container">
+          ✅ <span id="val-correct">0</span> ❌ <span id="val-wrong">0</span>
+        </div>
+
+        <button
+          id="toggle-board-btn"
+          class="btn-icon"
+          title="Сховати/Показати дошку"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="9" y1="21" x2="9" y2="9"></line>
+          </svg>
+          <span>Дошка</span>
+        </button>
+      </header>
+
+      <div class="content-container">
+        <div id="quiz-root"></div>
+        <button class="btn-finish" onclick="finishLesson()">
+          Завершити урок
+        </button>
+      </div>
+    </div>
+
+    <div id="board-section">
+      <div class="tools">
+        <button class="btn-tool active" onclick="setTool('pen')" id="t-pen">
+          🖊️
+        </button>
+        <button class="btn-tool" onclick="setTool('eraser')" id="t-eraser">
+          🧹
+        </button>
+        <button class="btn-tool" onclick="drawSystem()">📉</button>
+        <button class="btn-tool" onclick="clearCanvasSafe()" style="color: red">
+          ❌
+        </button>
+      </div>
+      <canvas id="board"></canvas>
+    </div>
+
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    ></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/board.js"></script>
+    <script src="../js/lesson-engine.js"></script>
+
+    <script>
+      const LESSON_DATA = {
+        // 1. НАЗВА УРОКУ (Відобразиться зверху і у вкладці)
+        title: "Алгебра 8. Множини",
+
+        // 2. ВПРАВИ І ШПАРГАЛКА
+        exercises: [
+          {
+            id: "info",
+            title: "📚 Шпаргалка: Числові множини",
+            desc: "Основні види чисел, які ти зустрінеш у математиці",
+            visual: `
+                <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.95rem;">
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+                        
+                        <div style="background: #f0fdf4; padding: 16px; border-radius: 12px; border: 1px solid #bbf7d0; display: flex; align-items: start; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                            <div style="background: #10b981; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; flex-shrink: 0;">$N$</div>
+                            <div>
+                                <div style="font-weight: 700; color: #15803d; margin-bottom: 4px;">Натуральні</div>
+                                <div style="color: #64748b; line-height: 1.3;">Числа, що використовуються при лічбі.</div>
+                                <div style="margin-top: 6px; font-weight: 600; color: #166534; background: rgba(255,255,255,0.6); padding: 4px 8px; border-radius: 6px; display: inline-block;">1, 2, 3, 4 ...</div>
+                            </div>
+                        </div>
+
+                        <div style="background: #eff6ff; padding: 16px; border-radius: 12px; border: 1px solid #bfdbfe; display: flex; align-items: start; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                            <div style="background: #3b82f6; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; flex-shrink: 0;">$Z$</div>
+                            <div>
+                                <div style="font-weight: 700; color: #1d4ed8; margin-bottom: 4px;">Цілі</div>
+                                <div style="color: #64748b; line-height: 1.3;">Натуральні + протилежні + нуль.</div>
+                                <div style="margin-top: 6px; font-weight: 600; color: #1e40af; background: rgba(255,255,255,0.6); padding: 4px 8px; border-radius: 6px; display: inline-block;">... -2, -1, 0, 1 ...</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+
+                        <div style="background: #eef2ff; padding: 16px; border-radius: 12px; border: 1px solid #c7d2fe; display: flex; align-items: start; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                            <div style="background: #6366f1; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; flex-shrink: 0;">$Q$</div>
+                            <div>
+                                <div style="font-weight: 700; color: #4338ca; margin-bottom: 4px;">Раціональні</div>
+                                <div style="color: #64748b; line-height: 1.3;">Можна подати дробом $m/n$.</div>
+                                <div style="margin-top: 6px; font-weight: 600; color: #3730a3; background: rgba(255,255,255,0.6); padding: 4px 8px; border-radius: 6px; display: inline-block;">1/2; -0.5; 5; 0.333...</div>
+                            </div>
+                        </div>
+
+                        <div style="background: #fff7ed; padding: 16px; border-radius: 12px; border: 1px solid #fed7aa; display: flex; align-items: start; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                            <div style="background: #f97316; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; flex-shrink: 0;">$I$</div>
+                            <div>
+                                <div style="font-weight: 700; color: #c2410c; margin-bottom: 4px;">Ірраціональні</div>
+                                <div style="color: #64748b; line-height: 1.3;">Нескінченні неперіодичні дроби.</div>
+                                <div style="margin-top: 6px; font-weight: 600; color: #9a3412; background: rgba(255,255,255,0.6); padding: 4px 8px; border-radius: 6px; display: inline-block;">$\\pi$, $\\sqrt{2}$, $\\sqrt{3}$...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: linear-gradient(to right, #f8fafc, #ffffff); padding: 14px; border-radius: 12px; border: 2px dashed #cbd5e1; text-align: center; margin-top: 4px;">
+                        <span style="color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Всі числа разом:</span>
+                        <div style="margin-top: 6px; font-size: 1.1rem; display: flex; justify-content: center; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <span style="font-weight: 800; color: #1e293b; font-size: 1.3rem;">$R$ <small>(Дійсні)</small></span> 
+                            <span style="color: #94a3b8;">=</span>
+                            <span style="background: #eef2ff; color: #4338ca; padding: 2px 8px; border-radius: 4px; font-weight: 600;">$Q$</span> 
+                            <span style="color: #94a3b8;">+</span>
+                            <span style="background: #fff7ed; color: #c2410c; padding: 2px 8px; border-radius: 4px; font-weight: 600;">$I$</span>
+                        </div>
+                    </div>
+
+                </div>
+            `,
+            tasks: [],
+          },
+          {
+            id: "15.1",
+            title: "15.1. (Усно)",
+            desc: "Чи правильно, що:",
+            tasks: [
+              {
+                id: "1)",
+                q: "$8$ — натуральне число?",
+                a: "Так",
+                opts: ["Так", "Ні"],
+              },
+              {
+                id: "2)",
+                q: "$-4,5$ — ціле число?",
+                a: "Ні",
+                opts: ["Так", "Ні"],
+              },
+              {
+                id: "3)",
+                q: "$\\sqrt{5}$ — раціональне число?",
+                a: "Ні",
+                opts: ["Так", "Ні"],
+              },
+              {
+                id: "4)",
+                q: "$-\\frac{2}{9}$ — дійсне число?",
+                a: "Так",
+                opts: ["Так", "Ні"],
+              },
+            ],
+          },
+          {
+            id: "15.2",
+            title: "15.2. Класифікація чисел",
+            desc: "Дано числа: $\\sqrt{10}; 0,333...; 45; -1,(6); \\pi; 23; -4,2; 0; -\\sqrt{3}; -3\\frac{1}{5}$. Оберіть правильний набір для кожного пункту:",
+            tasks: [
+              {
+                id: "1)",
+                q: "Натуральні числа:",
+                a: "$45$; $23$",
+                opts: [
+                  "$45$; $23$; $0$",
+                  "$45$; $23$",
+                  "$45$; $23$; $0,333...$",
+                  "Всі додатні",
+                ],
+              },
+              {
+                id: "2)",
+                q: "Цілі невід'ємні числа:",
+                a: "$45$; $23$; $0$",
+                opts: [
+                  "$45$; $23$",
+                  "$0$",
+                  "$45$; $23$; $0$",
+                  "$45$; $23$; $-4,2$",
+                ],
+              },
+              {
+                id: "3)",
+                q: "Раціональні від'ємні числа:",
+                a: "$-1,(6)$; $-4,2$; $-3\\frac{1}{5}$",
+                opts: [
+                  "$-1,(6)$; $-4,2$; $-3\\frac{1}{5}$",
+                  "$-\\sqrt{3}$; $-4,2$",
+                  "$-4,2$; $-3\\frac{1}{5}$; $-1,(6)$; $-\\sqrt{3}$",
+                  "$-4,2$",
+                ],
+              },
+              {
+                id: "4)",
+                q: "Ірраціональні числа:",
+                a: "$\\sqrt{10}$; $\\pi$; $-\\sqrt{3}$",
+                opts: [
+                  "$\\sqrt{10}$; $\\pi$",
+                  "$0,333...$; $\\pi$",
+                  "$\\sqrt{10}$; $\\pi$; $-\\sqrt{3}$",
+                  "Всі корені",
+                ],
+              },
+            ],
+          },
+          {
+            id: "15.4",
+            title: "15.4. Відношення цілого до натурального",
+            desc: "Подайте число як відношення цілого числа до натурального (наприклад, $a/b$):",
+            tasks: [
+              { id: "1)", q: "$15$", a: ["15/1"], type: "input" },
+              { id: "2)", q: "$-12$", a: ["-12/1"], type: "input" },
+              { id: "3)", q: "$3\\frac{1}{4}$", a: ["13/4"], type: "input" },
+              { id: "4)", q: "$-2,3$", a: ["-23/10"], type: "input" },
+            ],
+          },
+          {
+            id: "15.6",
+            title: "15.6. Підмножини дробів",
+            desc: "З множини $\\{\\frac{1}{5}; \\frac{8}{7}; \\frac{3}{3}; \\frac{2}{9}; \\frac{6}{1}; \\frac{4}{5}\\}$ виділіть підмножину:",
+            tasks: [
+              {
+                id: "1)",
+                q: "Правильних дробів:",
+                // Оновлено: використовуємо \dfrac та сувору відповідність рядків
+                a: "$\\dfrac{1}{5}$; $\\dfrac{2}{9}$; $\\dfrac{4}{5}$",
+                opts: [
+                  "$\\dfrac{1}{5}$; $\\dfrac{4}{5}$",
+                  "$\\dfrac{1}{5}$; $\\dfrac{2}{9}$; $\\dfrac{4}{5}$",
+                  "$\\dfrac{3}{3}$; $\\dfrac{6}{1}$",
+                  "$\\dfrac{8}{7}$; $\\dfrac{3}{3}$",
+                ],
+              },
+              {
+                id: "2)",
+                q: "Неправильних дробів:",
+                a: "$\\dfrac{8}{7}$; $\\dfrac{3}{3}$; $\\dfrac{6}{1}$",
+                opts: [
+                  "$\\dfrac{8}{7}$; $\\dfrac{6}{1}$",
+                  "$\\dfrac{3}{3}$",
+                  "$\\dfrac{8}{7}$; $\\dfrac{3}{3}$; $\\dfrac{6}{1}$",
+                  "Всі інші",
+                ],
+              },
+            ],
+          },
+          {
+            id: "15.8",
+            title: "15.8. Нескінченний десятковий дріб",
+            desc: "Подайте число $\\frac{5}{33}$ у вигляді нескінченного десяткового дробу й округліть його:",
+            tasks: [
+              {
+                id: "1)",
+                q: "До сотих ($0,xx$):",
+                a: "0.15",
+                type: "input",
+              },
+              {
+                id: "2)",
+                q: "До тисячних ($0,xxx$):",
+                a: "0.152",
+                type: "input",
+              },
+            ],
+          },
+          {
+            id: "15.10",
+            title: "15.10. (Усно) Належність до множин",
+            desc: "Чи правильно записано твердження ($N$-нат, $Z$-цілі, $Q$-рац, $R$-дійсні)?",
+            tasks: [
+              { id: "1)", q: "$5 \\notin N$", a: "Ні", opts: ["Так", "Ні"] },
+              { id: "2)", q: "$-3 \\in Z$", a: "Так", opts: ["Так", "Ні"] },
+              { id: "3)", q: "$7 \\notin Q$", a: "Ні", opts: ["Так", "Ні"] },
+              { id: "4)", q: "$15 \\in R$", a: "Так", opts: ["Так", "Ні"] },
+              {
+                id: "5)",
+                q: "$-2,5 \\notin N$",
+                a: "Так",
+                opts: ["Так", "Ні"],
+              },
+              { id: "6)", q: "$-4,1 \\in Q$", a: "Так", opts: ["Так", "Ні"] },
+              {
+                id: "7)",
+                q: "$-5,12 \\notin R$",
+                a: "Ні",
+                opts: ["Так", "Ні"],
+              },
+              {
+                id: "8)",
+                q: "$\\sqrt{5} \\in Q$",
+                a: "Ні",
+                opts: ["Так", "Ні"],
+              },
+              {
+                id: "9)",
+                q: "$\\sqrt{36} \\in N$",
+                a: "Так",
+                opts: ["Так", "Ні"],
+              },
+              {
+                id: "10)",
+                q: "$-\\sqrt{16} \\notin R$",
+                a: "Ні",
+                opts: ["Так", "Ні"],
+              },
+              {
+                id: "11)",
+                q: "$\\sqrt{1/4} \\notin Z$",
+                a: "Так",
+                opts: ["Так", "Ні"],
+              },
+              {
+                id: "12)",
+                q: "$\\sqrt{1\\frac{7}{9}} \\in Q$",
+                a: "Так",
+                opts: ["Так", "Ні"],
+              },
+            ],
+          },
+          {
+            id: "15.11",
+            title: "15.11. Порівняння чисел",
+            desc: "Порівняйте числа:",
+            tasks: [
+              {
+                id: "1)",
+                q: "$1,200$ і $1,215$",
+                a: "<",
+                opts: [">", "<", "="],
+              },
+              {
+                id: "2)",
+                q: "$-3,52$ і $-3,25$",
+                a: "<",
+                opts: [">", "<", "="],
+              },
+              {
+                id: "3)",
+                q: "$-\\frac{1}{10}$ і $0$",
+                a: "<",
+                opts: [">", "<", "="],
+              },
+              {
+                id: "4)",
+                q: "$\\pi$ і $3,15$",
+                a: "<",
+                opts: [">", "<", "="],
+              },
+              {
+                id: "5)",
+                q: "$-\\pi$ і $-3,1$",
+                a: "<",
+                opts: [">", "<", "="],
+              },
+              {
+                id: "6)",
+                q: "$1,6$ і $1,(6)$",
+                a: "<",
+                opts: [">", "<", "="],
+              },
+              {
+                id: "7)",
+                q: "$-1,73$ і $-\\sqrt{3}$",
+                a: ">",
+                opts: [">", "<", "="],
+              },
+              {
+                id: "8)",
+                q: "$\\sqrt{2}$ і $1,4$",
+                a: ">",
+                opts: [">", "<", "="],
+              },
+              {
+                id: "9)",
+                q: "$2\\frac{5}{13}$ і $2,(39)$",
+                a: "<",
+                opts: [">", "<", "="],
+              },
+            ],
+          },
+          {
+            id: "15.13",
+            title: "15.13. Наближене значення",
+            desc: "Знайдіть наближене значення виразу, округливши значення кореня до сотих (підказка: $\\sqrt{10} \\approx 3,16$; $\\sqrt{3} \\approx 1,73$):",
+            tasks: [
+              { id: "1)", q: "$\\sqrt{10} + 1,15$", a: "4.31", type: "input" },
+              { id: "2)", q: "$4,25 - \\sqrt{3}$", a: "2.52", type: "input" },
+            ],
+          },
+          {
+            id: "15.15",
+            title: "15.15. Характеристика множини",
+            desc: "Множина $A$ складається з коренів рівняння $0x = 5$. Що це за множина?",
+            tasks: [
+              {
+                id: "1)",
+                q: "Множина $A = $?",
+                a: "Порожня множина",
+                opts: [
+                  "$\\{0\\}$",
+                  "$\\{5\\}$",
+                  "Порожня множина $\\varnothing$",
+                  "Множина дійсних чисел",
+                ],
+              },
+            ],
+          },
+          {
+            id: "15.16",
+            title: "15.16. Підмножини",
+            desc: "Чи правильно, що $A \\subset B$ ($A$ є підмножиною $B$), якщо:",
+            tasks: [
+              {
+                id: "1)",
+                q: "$A=\\{2\\}; B=\\{2; 4; 6\\}$",
+                a: "Так",
+                opts: ["Так", "Ні"],
+              },
+              {
+                id: "2)",
+                q: "$A=\\{\\Delta\\}; B=\\{\\Delta; \\square\\}$",
+                a: "Так",
+                opts: ["Так", "Ні"],
+              },
+              {
+                id: "3)",
+                q: "$A=\\varnothing; B=\\{1; 2\\}$",
+                a: "Так",
+                opts: ["Так", "Ні"],
+              },
+              {
+                id: "4)",
+                q: "$A=\\{x; y\\}; B=\\{x\\}$",
+                a: "Ні",
+                opts: ["Так", "Ні"],
+              },
+              {
+                id: "5)",
+                q: "$A$ - прості числа; $B$ - натуральні",
+                a: "Так",
+                opts: ["Так", "Ні"],
+              },
+              {
+                id: "6)",
+                q: "$A$ - цілі числа; $B$ - натуральні, кратні 10",
+                a: "Ні",
+                opts: ["Так", "Ні"],
+              },
+            ],
+          },
+          {
+            id: "15.18",
+            title: "15.18. Спадання",
+            desc: "Розмістіть у порядку спадання числа: $0,22$; $0,(2)$; $0,02$; $\\frac{1}{5}$; $\\frac{3}{4}$.",
+            tasks: [
+              {
+                id: "1)",
+                q: "Правильний порядок:",
+                a: "$\\frac{3}{4}$; $0,(2)$; $0,22$; $\\frac{1}{5}$; $0,02$",
+                opts: [
+                  "$\\frac{3}{4}$; $0,(2)$; $0,22$; $\\frac{1}{5}$; $0,02$",
+                  "$0,(2)$; $0,22$; $\\frac{3}{4}$; $\\frac{1}{5}$; $0,02$",
+                  "$\\frac{3}{4}$; $0,22$; $0,(2)$; $0,02$; $\\frac{1}{5}$",
+                  "$\\frac{1}{5}$; $0,02$; $0,22$; $0,(2)$; $\\frac{3}{4}$",
+                ],
+              },
+            ],
+          },
+          {
+            id: "15.20",
+            title: "15.20. Властивості чисел",
+            desc: "Чи правильно, що:",
+            tasks: [
+              {
+                id: "1)",
+                q: "Сума двох натуральних чисел — натуральне?",
+                a: "Так",
+                opts: ["Так", "Ні"],
+              },
+              {
+                id: "2)",
+                q: "Різниця двох раціональних чисел — раціональне?",
+                a: "Так",
+                opts: ["Так", "Ні"],
+              },
+              {
+                id: "3)",
+                q: "Будь-яке натуральне число є цілим?",
+                a: "Так",
+                opts: ["Так", "Ні"],
+              },
+              {
+                id: "4)",
+                q: "Множина дійсних чисел складається тільки з додатних і від'ємних?",
+                a: "Ні",
+                opts: ["Так", "Ні"],
+              },
+            ],
+          },
+          {
+            id: "15.21",
+            title: "15.21. Пошук числа",
+            desc: "Запишіть будь-яке раціональне число, що міститься між $2,33$ і $2,(3)$.",
+            tasks: [
+              {
+                id: "1)",
+                q: "Число:",
+                a: ["2.331", "2.332", "2.333", "2.3315", "2.3325"],
+                type: "input",
+              },
+            ],
+          },
+        ],
+      };
+    </script>
+  </body>
+</html>

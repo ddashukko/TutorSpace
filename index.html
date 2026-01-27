@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Моя Платформа</title>
+    <link rel="stylesheet" href="css/style-main.css" />
+  </head>
+  <body>
+    <div id="loginModal" class="overlay">
+      <div class="modal">
+        <h2>Вітаю!</h2>
+        <p>Як тебе звати?</p>
+        <input type="text" id="username" placeholder="Прізвище та Ім'я" />
+        <br /><br />
+        <button onclick="login()">Почати навчання</button>
+      </div>
+    </div>
+
+    <header>
+      <div style="font-weight: 900; color: var(--primary); font-size: 1.2rem">
+        MyTutor
+      </div>
+      <div style="display: flex; gap: 20px; align-items: center">
+        <span id="welcomeName">Гість</span>
+        <button
+          onclick="logout()"
+          style="
+            padding: 5px 15px;
+            font-size: 0.9rem;
+            background: var(--text-muted);
+          "
+        >
+          Вийти
+        </button>
+      </div>
+    </header>
+
+    <div class="container">
+      <h2 style="margin: 30px 0">Мої курси</h2>
+
+      <div id="lessonGrid" class="lesson-grid"></div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>
