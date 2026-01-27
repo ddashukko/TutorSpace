@@ -7,7 +7,7 @@ const currentLessonConfig = LESSONS.find((l) =>
   currentPath.includes(l.file),
 ) || { id: "debug", maxScore: 100, class: "8" };
 
-// Ключ для локального збереження (щоб не губилось при оновленні)
+// Ключ для локального збереження
 const STORAGE_KEY = `tutor_progress_${localStorage.getItem("studentName")}_${currentLessonConfig.id}`;
 
 let totalCorrect = 0;
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Визначення джерела даних (Шаблон або Старий формат)
   let dataToRender = [];
   if (typeof LESSON_DATA !== "undefined") {
-    // Новий формат (шаблон)
+    // Новий формат
     document.title = LESSON_DATA.title;
     const headerTitle = document.getElementById("lesson-title-display");
     if (headerTitle) headerTitle.innerText = LESSON_DATA.title;
@@ -40,11 +40,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // Побудова уроку
   renderBuilder(dataToRender);
 
-  // КРОК 1: Відновлюємо те, що є в браузері (чернетка)
+  // КРОК 1: Відновлюємо локальну чернетку
   const localState = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
   restoreProgress(localState);
 
-  // КРОК 2: Пробуємо завантажити з сервера (щоб бачити прогрес учня)
+  // КРОК 2: Завантажуємо з сервера (для перегляду вчителем)
   loadServerProgress(studentName);
 
   // Рендер формул (Katex)
@@ -57,7 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // --- 3. ФУНКЦІЯ ЗАВАНТАЖЕННЯ З СЕРВЕРА ---
 async function loadServerProgress(studentName) {
-  // Якщо немає API, виходимо
   if (typeof API_URL === "undefined" || !API_URL) return;
 
   try {
@@ -67,14 +66,11 @@ async function loadServerProgress(studentName) {
     );
     const data = await response.json();
 
-    // Шукаємо спроби саме для ЦЬОГО уроку
     const attempts = data.filter((d) => d.lessonId === currentLessonConfig.id);
 
     if (attempts.length > 0) {
-      // Беремо останню спробу
       const lastAttempt = attempts[attempts.length - 1];
 
-      // Якщо є збережені деталі відповідей
       if (lastAttempt.details) {
         let serverState = {};
         try {
@@ -84,25 +80,22 @@ async function loadServerProgress(studentName) {
           return;
         }
 
-        // Візуальна індикація, що це дані з хмари
         const statsContainer = document.querySelector(".stats-container");
         if (statsContainer) {
-          statsContainer.style.border = "2px solid #10b981"; // Зелена рамка
-          statsContainer.title =
-            "Відображається збережений результат з сервера";
+          statsContainer.style.border = "2px solid #10b981";
+          statsContainer.title = "Відображається результат з сервера";
         }
 
-        // Застосовуємо відповіді на сторінку
         restoreProgress(serverState);
-        console.log("Дані учня завантажено!");
+        console.log("Дані завантажено!");
       }
     }
   } catch (e) {
-    console.warn("Офлайн режим або помилка сервера:", e);
+    console.warn("Офлайн режим або помилка API:", e);
   }
 }
 
-// --- 4. БУДІВЕЛЬНИК (РЕНДЕР HTML) ---
+// --- 4. БУДІВЕЛЬНИК (З ВИПРАВЛЕННЯМ ДЛЯ LaTeX) ---
 function renderBuilder(data) {
   const root = document.getElementById("quiz-root");
   root.innerHTML = "";
@@ -111,7 +104,6 @@ function renderBuilder(data) {
     const card = document.createElement("div");
     card.className = "exercise-block";
 
-    // Заголовок
     let html = `
         <div class="exercise-header">
             <h3>${ex.title}</h3>
@@ -119,12 +111,10 @@ function renderBuilder(data) {
         </div>
     `;
 
-    // Візуальна частина (Шпаргалка або картинка)
     if (ex.visual) {
       html += `<div style="padding: 20px;" class="cheat-content">${ex.visual}</div>`;
     }
 
-    // Завдання
     if (ex.tasks && ex.tasks.length > 0) {
       html += `<div class="task-list">`;
       ex.tasks.forEach((task) => {
@@ -140,10 +130,12 @@ function renderBuilder(data) {
 
         if (task.type === "input") {
           const answers = Array.isArray(task.a) ? task.a.join("|") : task.a;
+          // Екрануємо лапки, щоб не ламало HTML
+          const safeAns = answers.replace(/"/g, "&quot;");
           html += `
                 <div class="input-group">
                     <input type="text" placeholder="..." onkeydown="if(event.key==='Enter') this.nextElementSibling.click()">
-                    <button class="btn-check" onclick="handleInput(this, '${answers}')">ОК</button>
+                    <button class="btn-check" onclick="handleInput(this, '${safeAns}')">ОК</button>
                 </div>
             `;
         } else {
@@ -151,7 +143,12 @@ function renderBuilder(data) {
           html += `<div class="options-container">`;
           opts.forEach((opt) => {
             const isCorrect = opt === task.a;
-            html += `<button class="option-btn" onclick="handleOption(this, ${isCorrect}, '${opt}')">${opt}</button>`;
+
+            // ВАЖЛИВО: Зберігаємо значення в data-val, екрануючи лапки
+            // Це дозволяє зберігати LaTeX формули без помилок
+            const safeVal = opt.replace(/"/g, "&quot;");
+
+            html += `<button class="option-btn" data-val="${safeVal}" onclick="handleOption(this, ${isCorrect})">${opt}</button>`;
           });
           html += `</div>`;
         }
@@ -165,7 +162,7 @@ function renderBuilder(data) {
   });
 }
 
-// --- 5. ОБРОБКА ДІЙ КОРИСТУВАЧА ---
+// --- 5. ОБРОБКА ДІЙ (З ВИПРАВЛЕННЯМ) ---
 
 function handleInput(btn, correctStr) {
   const row = btn.closest(".task-row");
@@ -178,39 +175,32 @@ function handleInput(btn, correctStr) {
   const answers = correctStr.split("|");
   const isCorrect = answers.includes(val);
 
-  // Візуалізація
   if (isCorrect) input.classList.add("correct");
   else input.classList.add("wrong");
 
-  // Блокування
   input.disabled = true;
   btn.disabled = true;
 
-  // Збереження
   saveState(uid, val, isCorrect, "input");
-
-  // Оновлення лічильників
   recalcStats();
 }
 
-function handleOption(btn, isCorrect, val) {
+function handleOption(btn, isCorrect) {
   const row = btn.closest(".task-row");
   const uid = row.dataset.uid;
   const allBtns = row.querySelectorAll(".option-btn");
 
   if (allBtns[0].disabled) return;
 
-  // Блокуємо всі кнопки в рядку
+  // ВАЖЛИВО: Беремо значення з data-val (там воно чисте і правильне)
+  const val = btn.dataset.val;
+
   allBtns.forEach((b) => (b.disabled = true));
 
-  // Візуалізація
   if (isCorrect) btn.classList.add("selected-correct");
   else btn.classList.add("selected-wrong");
 
-  // Збереження
   saveState(uid, val, isCorrect, "option");
-
-  // Оновлення лічильників
   recalcStats();
 }
 
@@ -222,7 +212,6 @@ function saveState(uid, val, isCorrect, type) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-// Універсальна функція відновлення (працює і для локальних, і для серверних даних)
 function restoreProgress(state) {
   if (!state) return;
 
@@ -236,10 +225,8 @@ function restoreProgress(state) {
         const btn = row.querySelector(".btn-check");
         if (input && btn) {
           input.value = saved.val;
-          // Скидаємо класи перед додаванням (щоб не дублювались)
           input.classList.remove("correct", "wrong");
           input.classList.add(saved.isCorrect ? "correct" : "wrong");
-
           input.disabled = true;
           btn.disabled = true;
         }
@@ -249,7 +236,8 @@ function restoreProgress(state) {
           b.disabled = true;
           b.classList.remove("selected-correct", "selected-wrong");
 
-          if (b.innerText === saved.val) {
+          // ВАЖЛИВО: Порівнюємо з data-val, щоб розпізнати LaTeX формули
+          if (b.dataset.val === saved.val) {
             b.classList.add(
               saved.isCorrect ? "selected-correct" : "selected-wrong",
             );
@@ -259,11 +247,9 @@ function restoreProgress(state) {
     }
   });
 
-  // Після відновлення перераховуємо статистику
   recalcStats();
 }
 
-// Перерахунок балів на основі DOM (найнадійніший спосіб)
 function recalcStats() {
   totalCorrect = document.querySelectorAll(
     ".correct, .selected-correct",
@@ -282,7 +268,6 @@ function finishLesson() {
   const max = currentLessonConfig.maxScore || 1;
   const percent = Math.round((totalCorrect / max) * 100);
 
-  // Створення модалки
   if (!document.getElementById("resultModal")) {
     const modalHTML = `
       <div id="resultModal" class="modal-overlay">
@@ -305,7 +290,6 @@ function finishLesson() {
     `;
     document.body.insertAdjacentHTML("beforeend", modalHTML);
   } else {
-    // Оновлення модалки
     document.querySelector(".modal-score-circle").innerText = `${percent}%`;
     document.querySelector(".modal-text").innerHTML = `
         Правильних відповідей: <b>${totalCorrect}</b><br>
@@ -329,7 +313,6 @@ async function submitResults() {
     classLevel: currentLessonConfig.class,
     score: totalCorrect,
     maxScore: currentLessonConfig.maxScore,
-    // Важливо: зберігаємо весь об'єкт відповідей
     details: JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"),
   };
 
@@ -360,10 +343,8 @@ async function retryLesson() {
   const btns = document.querySelectorAll(".modal-actions button");
   btns.forEach((b) => (b.disabled = true));
 
-  // 1. Чистимо локально
   localStorage.removeItem(STORAGE_KEY);
 
-  // 2. Чистимо на сервері
   const data = {
     action: "reset",
     studentName: localStorage.getItem("studentName"),
