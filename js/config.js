@@ -50,7 +50,7 @@ const LESSONS = [
     class: "10",
     maxScore: 12,
   },
-   {
+  {
     id: "math_6_kulia_konus_cilindr",
     title: "Куля, конус, циліндр",
     file: "lessons/math_6_kulia_konus_cilindr.html",
